@@ -1,4 +1,5 @@
 from ship import Ship
+from log import Log
 
 def create_ship(filename):
     '''Input filename of manifest, parses file contents. Returns ship object.'''
@@ -10,3 +11,4 @@ def create_ship(filename):
 
 if __name__=='__main__':
     create_ship('ShipCase1.txt')
+    Log('').writelog("Testing Log")
