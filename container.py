@@ -1,5 +1,5 @@
 class Container:
-    def __init__(self, pos, weight, name):
+    def __init__(self, pos: str, weight: int, name: str) -> None:
         self.pos = pos
         self.weight = weight
         self.name = name

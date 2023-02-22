@@ -10,11 +10,13 @@ def create_ship(manifest_filename, op_filename):
     with open(op_filename) as f:
         loads = f.readline().strip().split(",")
         unloads = f.readline().strip().split(",")
+
     ret = Ship(manifest_cntnt, loads, unloads)
-    print(ret.check_goal_state())
+    ret.print_weights()
+    print(ret.is_balanced())
     return ret
 
 
 if __name__ == "__main__":
-    create_ship("ShipCase1.txt", "load_unload.txt")
+    create_ship("shipcasetest.txt", "load_unload.txt")
     Log("").writelog("Testing Log")
