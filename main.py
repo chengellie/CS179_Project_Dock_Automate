@@ -19,5 +19,9 @@ def create_ship(manifest_filename, op_filename):
 
 if __name__ == "__main__":
     create_ship("shipcasetest.txt", "load_unload.txt")
-    # log = Log("testlog").writelog("Testing Log") # Keep this uncommented unless testing logs
+
+    # Keep these commented unless testing logs
+    # log = Log("testlog")
+    # log.writelog("Testing Log")
+    # log.writecomment("Good Day Sir")
 
