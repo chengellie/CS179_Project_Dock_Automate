@@ -1,7 +1,13 @@
 from flask import Blueprint, render_template
 
-views = Blueprint('views', __name__)
+home_page = Blueprint('home_page', __name__)
+tables = Blueprint('tables', __name__)
 
-@views.route('/')
+
+@home_page.route('/')
 def home():
     return render_template('home.html')
+
+@tables.route('/')
+def table():
+    return render_template('table.html')
