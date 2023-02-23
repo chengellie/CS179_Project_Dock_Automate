@@ -12,6 +12,7 @@ def create_ship(manifest_filename, op_filename, outbound_filename):
         unloads = f.readline().strip().split(",")
 
     ret = Ship(manifest_cntnt, loads, unloads)
+    print(ret)
     ret.print_weights()
     print(ret.is_balanced())
     outbound_contents = ret.get_outbound_manifest()

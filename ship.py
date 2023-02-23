@@ -128,3 +128,7 @@ class Ship:
                     ret += "\n"
 
         return ret
+
+    def update_cntr_pos(self, cntr: Container, i: int, j: int) -> None:
+        """Inputs container indices in ship, updates container object. Returns None."""
+        cntr.set_pos(i + 1, self.row - j)
