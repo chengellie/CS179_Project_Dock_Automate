@@ -1,6 +1,6 @@
 from container import Container
 
-# isBalanced, animation steps from _ to _, outbound manifest
+# container, animation steps from _ to _, outbound manifest
 
 
 class Ship:
@@ -105,8 +105,7 @@ class Ship:
         ret = ""
         for row in self.ship_state:
             for cntr in row:
-                shortened = cntr.name[:6].ljust(6)
-                ret += shortened + " "
+                ret += cntr.get_shortened_name() + " "
             ret += "\n"
         return ret
 
