@@ -9,7 +9,7 @@
     table {
       border-spacing: 3px;
     }
-    </style>
+</style>
 
 <div class="w3-row-padding">
     <div class="w3-half w3-container">
@@ -17,14 +17,32 @@
     </div>
     <div class="w3-half w3-container">
         <table style="width:100%">
-        {%for i in item%}
+        {%for i in range(row)%}
         <tr>
-            {% for j in i%}
-                <td style="background-color:{{color[0]}};color:white;">{{j}}</td>
+            {% for j in range(col)%}
+                <td id="ship_{{i}}_{{j}}" style="background-color:{{color[0]}};color:white;">{{item[i][j]}}</td>
             {% endfor %}
         </tr>
         {% endfor %}
         </table>
     </div>
 </div>
+
+
+
+<script>
+    // var start = {{at|tojson|safe}};
+    // var end = {{go|tojson|safe}};
+    var start = ['ship_7_1','ship_6_1'];
+    var end = ['ship_6_1','ship_5_1'];
+
+
+    $(start[0]).click(function(){
+        $(end[0]).text('cat');
+        $(end[0]).css('background-color', 'red');
+        $(start[0]).text('');
+        $(start[0]).css('background-color', 'white');
+    });  
+</script>
 {% endblock %}
+
