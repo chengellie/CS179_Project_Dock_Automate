@@ -1,7 +1,5 @@
 from container import Container
 
-# animation steps from _ to _,
-
 
 class Ship:
     def __init__(self, manifest: str, loads, unloads) -> None:
@@ -58,6 +56,7 @@ class Ship:
                     del self.goal_state[cntr_name]
             else:
                 print("Error: trying to unload item that is not in ship")
+                return
 
     def is_goal_state(self) -> bool:
         """Inputs None, Returns if current ship_state matches goal_state."""
