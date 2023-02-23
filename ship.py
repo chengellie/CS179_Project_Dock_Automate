@@ -76,6 +76,7 @@ class Ship:
     def is_balanced(self) -> bool:
         """Inputs None, Returns if ship is balanced.
         Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
+        (including exactly 10%)
         """
         # find mass of left and right half
         left = 0
@@ -87,10 +88,12 @@ class Ship:
                 else:
                     right += cntr.weight
 
+        print(left, right)
+
         # determine if ship is balanced
-        if left < right and left > 0.9 * right:
+        if left < right and left >= 0.9 * right:
             return True
-        elif right < left and right > 0.9 * left:
+        elif right < left and right >= 0.9 * left:
             return True
         elif left == right:
             return True
