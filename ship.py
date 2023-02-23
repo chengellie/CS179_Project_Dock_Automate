@@ -1,6 +1,6 @@
 from container import Container
 
-# container, animation steps from _ to _, outbound manifest
+# animation steps from _ to _,
 
 
 class Ship:
@@ -12,7 +12,6 @@ class Ship:
         self.col = 12
         self.__init_ship_state(manifest)
         self.__init_goal_state(loads, unloads)
-        print(self)
 
     def __init_ship_state(self, manifest: str) -> None:
         """Input list of strings from manifest, constructs container objects and fills ship object with containers. Returns None."""
@@ -73,6 +72,25 @@ class Ship:
                     self.curr_state[cntr_name] = 1
         return self.curr_state == self.goal_state
 
+    def __str__(self) -> str:
+        """Inputs None, prints ship names in grid format. Returns None."""
+        ret = ""
+        for row in self.ship_state:
+            for cntr in row:
+                ret += cntr.get_shortened_name() + " "
+            ret += "\n"
+        return ret
+
+    def print_weights(self) -> None:
+        """Inputs None, prints ship weights in grid format. Returns None."""
+        ret = ""
+        for row in self.ship_state:
+            for cntr in row:
+                shortened = str(cntr.weight)[:6].ljust(6)
+                ret += shortened + " "
+            ret += "\n"
+        print(ret)
+
     def is_balanced(self) -> bool:
         """Inputs None, Returns if ship is balanced.
         Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
@@ -100,21 +118,13 @@ class Ship:
         else:
             return False
 
-    def __str__(self) -> str:
-        """Inputs None, prints ship names in grid format. Returns None."""
+    def get_outbound_manifest(self) -> str:
+        """Inputs None, Returns contents for outbound manifest."""
         ret = ""
-        for row in self.ship_state:
-            for cntr in row:
-                ret += cntr.get_shortened_name() + " "
-            ret += "\n"
-        return ret
+        for i in range(self.row - 1, -1, -1):
+            for j in range(self.col):
+                ret += self.ship_state[i][j].format_container()
+                if not (i == 0 and j == self.col - 1):
+                    ret += "\n"
 
-    def print_weights(self) -> None:
-        """Inputs None, prints ship weights in grid format. Returns None."""
-        ret = ""
-        for row in self.ship_state:
-            for cntr in row:
-                shortened = str(cntr.weight)[:6].ljust(6)
-                ret += shortened + " "
-            ret += "\n"
-        print(ret)
+        return ret
