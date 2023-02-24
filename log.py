@@ -23,11 +23,11 @@ class Log:
         # If Log file does not exist, create a new one and set necessary permissions
         file_exists, self.logfile = self.__find_valid_log(logname)
         if not file_exists:
-            print("No file, would you like to create a new one") # Change to match customer
+            print("No file, would you like to create a new one") # TODO: Change to match customer
             print("The log file has the logical year appended to its name. What year do you want the log file?")
             
             # Create new log file in filepath
-            self.logfile = f".{logname}2023.txt"    # Change to variable year
+            self.logfile = f".{logname}2023.txt"    # TODO: Change to variable year
             # self.filepath += f"\\{self.logfile}"  # Windows
             self.filepath += f"/{self.logfile}" # MacOS/Linux
             f = open(self.filepath, "w")

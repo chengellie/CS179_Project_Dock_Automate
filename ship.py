@@ -2,7 +2,7 @@ from container import Container
 
 
 class Ship:
-    def __init__(self, manifest: str, loads, unloads) -> None:
+    def __init__(self, manifest: str, loads=[], unloads=[]) -> None:
         self.ship_state = []
         self.curr_state = {}
         self.goal_state = {}
