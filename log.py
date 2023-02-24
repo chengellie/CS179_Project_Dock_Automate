@@ -20,7 +20,7 @@ class Log:
             os.mkdir(self.filepath)
             os.system(f"attrib +h {self.filepath}")
         
-        """If Log file does not exist, create a new one and set necessary permissions"""
+        # If Log file does not exist, create a new one and set necessary permissions
         file_exists, self.logfile = self.__find_valid_log(logname)
         if not file_exists:
             print("No file, would you like to create a new one") # Change to match customer
@@ -88,6 +88,15 @@ class Log:
     """write a user comment into log file"""
     def writecomment(self, comment:str):
         self.writelog(f"Comment: {comment}")
+
+    def readlog(self, printlog:bool = False):
+        with open(self.filepath, 'r') as logfile:
+            logdata = [logline.strip('\n') for logline in logfile.readlines()]
+        if printlog:
+            for line in logdata:
+                print(line)
+        
+        return logdata
     
 # test = Log('')
 # test.write_comment('Testing Comment')

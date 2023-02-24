@@ -45,3 +45,4 @@ if __name__ == "__main__":
     # log = Log("testlog")
     # log.writelog("Testing Log")
     # log.writecomment("Good Day Sir")
+    # log.readlog(printlog=True)
