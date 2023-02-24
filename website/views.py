@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, json
 from ship import Ship
+from shiputil import *
 
 home_page = Blueprint("home_page", __name__)
 tables = Blueprint("tables", __name__)
@@ -31,6 +32,11 @@ def table():
     color = ["rgb(44, 174, 214)", "red"]
     at = ["ship_7_1", "ship_6_1"]
     go = ["ship_6_1", "ship_5_1"]
+    moves = get_moves(ship, [7, 1], [7, 4])
+    for i, ls in enumerate(moves):
+        moves[i] = "#ship_" + str(moves[i][0]) + "_" + str(moves[i][1])
+    print(moves)
+    # moves = ["ship_7_1", "ship_6_1", "ship_5_1"]
     return render_template(
         "table.html",
         item=item,
@@ -39,4 +45,5 @@ def table():
         col=col,
         at=at,
         go=go,
+        moves=moves,
     )
