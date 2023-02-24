@@ -11,13 +11,14 @@ class Container:
 
     def __str__(self) -> str:
         """Inputs None. Returns representation of container object as a string."""
-        return (
-            f"Container {self.get_pos()}, Weight: {self.weight} kg, Name: {self.name}"
-        )
+        # return (
+        #     f"Container {self.get_pos()}, Weight: {self.weight} kg, Name: {self.name}"
+        # )
+        return self.get_shortened_name()
 
     def get_shortened_name(self) -> str:
         """Inputs None. Returns shortened version of container name."""
-        return str(self.name)[:6].ljust(6)
+        return str(self.name)[:6].ljust(6, " ")
 
     def get_str_weight(self) -> str:
         """Inputs None. Returns weight as a 5-character string."""

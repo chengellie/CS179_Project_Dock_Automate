@@ -2,12 +2,15 @@
 {% block title %} Table {% endblock %}
 {% block content %}
 <style>
-    table, th, td {
-      border: 5px solid black;
-      padding: 1px;
+    table,
+    th,
+    td {
+        border: 5px solid black;
+        padding: 1px;
     }
+
     table {
-      border-spacing: 3px;
+        border-spacing: 3px;
     }
 </style>
 
@@ -17,13 +20,13 @@
     </div>
     <div class="w3-half w3-container">
         <table style="width:100%">
-        {%for i in range(row)%}
-        <tr>
-            {% for j in range(col)%}
+            {%for i in range(row)%}
+            <tr>
+                {% for j in range(col)%}
                 <td id="ship_{{i}}_{{j}}" style="background-color:{{color[0]}};color:white;">{{item[i][j]}}</td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
         </table>
     </div>
 </div>
@@ -31,18 +34,32 @@
 
 
 <script>
-    // var start = {{at|tojson|safe}};
-    // var end = {{go|tojson|safe}};
-    var start = ['ship_7_1','ship_6_1'];
-    var end = ['ship_6_1','ship_5_1'];
 
+    // https://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
+    const timer = ms => new Promise(res => setTimeout(res, ms))
 
-    $(start[0]).click(function(){
-        $(end[0]).text('cat');
-        $(end[0]).css('background-color', 'red');
-        $(start[0]).text('');
-        $(start[0]).css('background-color', 'white');
+    async function swap() { // We need to wrap the loop into an async function for this to work
+        var at = {{ at|tojson }};
+        var go = {{ go|tojson }};
+        for (var i = 0; i < at.length; i++) {
+            console.log(i);
+            var cell_start = $("#" + at[i]).text();
+            var cell_end = $("#" + go[i]).text();
+            $("#" + go[i]).text(cell_start);
+            $("#" + go[i]).css('background-color', 'red');
+            $("#" + at[i]).text(cell_end);
+            $("#" + at[i]).css('background-color', 'rgb(44, 174, 214)');
+
+            await timer(1000); // then the created Promise can be awaited
+        }
+    }
+
+    $({{ at[0]}}).click(function () { 
+        swap();
     });  
+    
+    
+
+
 </script>
 {% endblock %}
-
