@@ -15,6 +15,10 @@ class TestSuite:
             if i != j:
                 return False
         return True
+
+    def __check_balance(self, ship:Ship) -> bool:
+        # TODO: Go through and check left and right to see if actually balanced (Without using isBalanced())
+        return False
         
     def test(self, num_runs, transferlist):
         print("#" * 15)
@@ -28,7 +32,7 @@ class TestSuite:
             print(f"Test Run {run + 1}")
             start_time = datetime.now()
 
-            ship = create_ship(self.manifest, transferlist)
+            ship = create_ship(self.manifest)   # TODO: Add load, unloads
             # TODO: Run program
             print(f"Time: {(datetime.now() - start_time).total_seconds()}s")
 
@@ -39,10 +43,12 @@ class TestSuite:
                 print("FAILED")
 
             print("\tShip Balancing:", end=" ")
-            if ship.is_balanced():
+            if self.__check_balance(ship):
                 print("PASSED")
             else:
                 print("FAILED")
+
+            outboundcase = create_ship(f"{self.manifest}OUTBOUND.txt")
 
         print("#" * 15)
             
@@ -55,6 +61,4 @@ Offload: [Cat]
     -> Onload: [Bat]
 Offload: [Dog]
 Onload: [Bird, Bird]
-
-LogCase1.txt
 """
