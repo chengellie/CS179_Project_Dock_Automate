@@ -128,6 +128,19 @@ class Ship:
 
         return ret
 
+    def get_ship_indices(self, cntr: Container):
+        """Inputs container. Returns contaier's position converted to ship indices as a list."""
+        return [self.row - cntr.x, cntr.y - 1]
+
     def update_cntr_pos(self, cntr: Container, i: int, j: int) -> None:
-        """Inputs container indices in ship, updates container object. Returns None."""
+        """Inputs container's new indices in ship, updates position for container object. Returns None."""
         cntr.set_pos(i + 1, self.row - j)
+
+    def get_container_depth(self, cntr: Container) -> int:
+        """Inputs container. Returns number of containers above current container."""
+        i, j = self.get_ship_indices(cntr)
+        count = 0
+        while i >= 0 and self.ship_state[i - 1][j] != "UNUSED":
+            count += 1
+            i -= 1
+        return count
