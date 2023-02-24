@@ -2,63 +2,81 @@
 {% block title %} Table {% endblock %}
 {% block content %}
 <style>
-    table, th, td {
-      border: 5px solid black;
-      padding: 5px;
+    table,
+    th,
+    td {
+        border: 5px solid black;
+        padding: 1px;
     }
+
     table {
-      border-spacing: 5px;
+        border-spacing: 3px;
     }
-    </style>
+</style>
 
 <div class="w3-row-padding">
-    <div class="w3-third w3-container">
+    <div class="w3-half w3-container">
         <h5> </h5>
     </div>
-    <div class="w3-third w3-container">
+    <div class="w3-half w3-container">
         <table style="width:100%">
-
+            {%for i in range(row)%}
             <tr>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:white;color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
+                {% for j in range(col)%}
+                    <td id="ship_{{i}}_{{j}}" style="background-color:{{color[0]}};color:white;">{{item[i][j]}}</td>
+                {% endfor %}
             </tr>
-            <tr>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:yellowgreen;color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            </tr>
-            <tr>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            </tr>
-            <tr>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-                <td style="background-color:rgb(44, 174, 214);color:white;"></td>
-            </tr>
+            {% endfor %}
         </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        $("td").each(function() {
+            if ($(this).text() == "UNUSED") {
+                $(this).css({'color': '{{color[0]}}'});
+            }
+            else {
+                $(this).css({'color': 'white'});
+            }
+        });
+    })
+</script>
+
+<script>
+
+    // https://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
+    const timer = ms => new Promise(res => setTimeout(res, ms))
+
+    async function swap() { // We need to wrap the loop into an async function for this to work
+        var moves = {{ moves|tojson }};
+        for (var i = 0; i + 1 < moves.length; i++) {
+            console.log(i);
+            var id_start = moves[i];
+            var id_end = moves[i+1];
+            var text_start = $(id_start).text();
+            var text_end = $(id_end).text();
+            var color_start = $(id_start).css( "color" );
+            var color_end = $(id_end).css( "color" );
+            $(id_end).text(text_start);
+            $(id_end).css('background-color', 'red');
+            $(id_end).css('color', color_start);
+            $(id_start).text(text_end);
+            $(id_start).css('background-color', '{{color[0]}}');
+            $(id_start).css('color', color_end);
+
+            await timer(500); // then the created Promise can be awaited
+        }
+    }
+
+    // console.log({{moves[0]}})
+    $("{{moves[0]}}").click(function () { 
+        swap();
+    });  
+    
+    
+
+
+</script>
 {% endblock %}

@@ -1,7 +1,5 @@
 from container import Container
 
-# isBalanced, animation steps from _ to _, outbound manifest
-
 
 class Ship:
     def __init__(self, manifest: str, loads, unloads) -> None:
@@ -12,7 +10,6 @@ class Ship:
         self.col = 12
         self.__init_ship_state(manifest)
         self.__init_goal_state(loads, unloads)
-        print(self)
 
     def __init_ship_state(self, manifest: str) -> None:
         """Input list of strings from manifest, constructs container objects and fills ship object with containers. Returns None."""
@@ -59,6 +56,7 @@ class Ship:
                     del self.goal_state[cntr_name]
             else:
                 print("Error: trying to unload item that is not in ship")
+                return
 
     def is_goal_state(self) -> bool:
         """Inputs None, Returns if current ship_state matches goal_state."""
@@ -73,37 +71,12 @@ class Ship:
                     self.curr_state[cntr_name] = 1
         return self.curr_state == self.goal_state
 
-    def is_balanced(self) -> bool:
-        """Inputs None, Returns if ship is balanced.
-        Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
-        """
-        # find mass of left and right half
-        left = 0
-        right = 0
-        for i, row in enumerate(self.ship_state):
-            for j, cntr in enumerate(row):
-                if j >= 0 and j <= self.row / 2:
-                    left += cntr.weight
-                else:
-                    right += cntr.weight
-
-        # determine if ship is balanced
-        if left < right and left > 0.9 * right:
-            return True
-        elif right < left and right > 0.9 * left:
-            return True
-        elif left == right:
-            return True
-        else:
-            return False
-
     def __str__(self) -> str:
         """Inputs None, prints ship names in grid format. Returns None."""
         ret = ""
         for row in self.ship_state:
             for cntr in row:
-                shortened = cntr.name[:6].ljust(6)
-                ret += shortened + " "
+                ret += cntr.get_shortened_name() + " "
             ret += "\n"
         return ret
 
@@ -116,3 +89,45 @@ class Ship:
                 ret += shortened + " "
             ret += "\n"
         print(ret)
+
+    def is_balanced(self) -> bool:
+        """Inputs None, Returns if ship is balanced.
+        Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
+        (including exactly 10%)
+        """
+        # find mass of left and right half
+        left = 0
+        right = 0
+        for i, row in enumerate(self.ship_state):
+            for j, cntr in enumerate(row):
+                if j >= 0 and j <= self.row / 2:
+                    left += cntr.weight
+                else:
+                    right += cntr.weight
+
+        print(left, right)
+
+        # determine if ship is balanced
+        if left < right and left >= 0.9 * right:
+            return True
+        elif right < left and right >= 0.9 * left:
+            return True
+        elif left == right:
+            return True
+        else:
+            return False
+
+    def get_outbound_manifest(self) -> str:
+        """Inputs None, Returns contents for outbound manifest."""
+        ret = ""
+        for i in range(self.row - 1, -1, -1):
+            for j in range(self.col):
+                ret += self.ship_state[i][j].format_container()
+                if not (i == 0 and j == self.col - 1):
+                    ret += "\n"
+
+        return ret
+
+    def update_cntr_pos(self, cntr: Container, i: int, j: int) -> None:
+        """Inputs container indices in ship, updates container object. Returns None."""
+        cntr.set_pos(i + 1, self.row - j)
