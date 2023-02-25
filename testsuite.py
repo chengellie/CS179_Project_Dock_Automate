@@ -9,7 +9,7 @@ class TestSuite:
         self.logfile = Log(logcase[:-4])
 
     """Compare for correctness between produced log file and test log file"""
-    def __compare_logs(self) -> bool, str:  # TODO: Maybe change to compare # of comments and actual texts written?
+    def __compare_logs(self) -> [bool, str]:  # TODO: Maybe change to compare # of comments and actual texts written?
         logdata = self.logfile.readlog()
         for (i, j) in zip(self.testlogcase, logdata):
             if i != j:
@@ -17,11 +17,11 @@ class TestSuite:
         return True, None
 
     """Check all container placements are valid"""
-    def __check_placement(self) -> bool, str:    # TODO: Check valid placement, asymetrical ship (non-container), and output issues
+    def __check_placement(self) -> [bool, str]:    # TODO: Check valid placement, asymetrical ship (non-container), and output issues
         return False
 
     """Check ship is balanced left and right"""
-    def __check_balance(self) -> bool, float, float:  # TODO: Compute total weights, comparison, and printing of weights
+    def __check_balance(self) -> [bool, float, float]:  # TODO: Compute total weights, comparison, and printing of weights
         left = 0.0
         right = 0.0
         # TODO: Go through and check left and right to see if actually balanced (Without using isBalanced())
