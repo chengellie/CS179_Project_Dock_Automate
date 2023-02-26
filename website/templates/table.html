@@ -23,7 +23,11 @@
             {%for i in range(row)%}
             <tr>
                 {% for j in range(col)%}
-                    <td id="ship_{{i}}_{{j}}" style="background-color:{{color[0]}};color:white;">{{item[i][j]}}</td>
+                    {% if item[i][j] == "UNUSED"%}
+                        <td id="ship_{{i}}_{{j}}" style="background-color:white;color:white;">{{item[i][j]}}</td>
+                    {% else %}
+                        <td id="ship_{{i}}_{{j}}" style="background-color:{{color[0]}};color:white;">{{item[i][j]}}</td>
+                    {% endif%}
                 {% endfor %}
             </tr>
             {% endfor %}
