@@ -47,6 +47,7 @@ Member Functions
 | is_goal_state                | Test whether current state is goal state                |
 | get_outbound_manifest        | Return contents for outbound manifest                   |
 | get_container_depth          | Return number of containers on top of a given container |
+| get_ship_columns             | Return single column or every column of ship as a list  |
 
 ## Global Functions
 
