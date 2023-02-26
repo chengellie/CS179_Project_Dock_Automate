@@ -5,7 +5,7 @@ def get_moves(ship: Ship, start_pos, end_pos):
     """Input ship, start and end pos. Returns list of coordinates to move container from start to end."""
     coord = []
 
-    # find row container needs to move vertically to
+    # find higest row container needs to move to, first empty row between start_pos and end_pos
     if start_pos[1] < end_pos[1]:
         left = start_pos
         right = end_pos

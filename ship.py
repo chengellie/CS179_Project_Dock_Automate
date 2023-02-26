@@ -1,40 +1,58 @@
 from container import Container
+from typing import List, Optional
 
 
 class Ship:
-    def __init__(self, manifest: str, loads=[], unloads=[]) -> None:
+    def __init__(
+        self,
+        manifest: Optional[List[str]] = None,
+        loads: Optional[list] = [],
+        unloads: Optional[list] = [],
+        cntr_names: Optional[List[List[str]]] = None,
+    ) -> None:
         self.ship_state = []
-        self.curr_state = {}
         self.goal_state = {}
         self.row = 8
         self.col = 12
-        self.__init_ship_state(manifest)
+        if manifest != None and cntr_names == None:
+            self.__init_ship_state_manifest(manifest)
+        elif manifest == None and cntr_names != None:
+            self.__init_ship_state_names(cntr_names)
         self.__init_goal_state(loads, unloads)
 
-    def __init_ship_state(self, manifest: str) -> None:
-        """Input list of strings from manifest, constructs container objects and fills ship object with containers. Returns None."""
+    def __init_ship_state_manifest(self, manifest: List[str]) -> None:
+        """Input manifest, constructs container objects and fills ship with containers. Returns None."""
         self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
 
         # extract container details from manifest list
         containers = []
         for item in manifest:
-            c = Container(item[0:7], int(item[10:15]), item[18:].strip())
+            coord = [int(item[1:3]), int(item[4:6])]
+            weight = int(item[10:15])
+            name = item[18:].strip()
+            c = Container(coord, weight, name, [self.row, self.col])
             containers.append(c)
 
-        # fill in 2d list for ship_state, constructing container order in grid view
+        # fill in 2d list for ship_state with containers
         k = 0
         for i in range(self.row - 1, -1, -1):
             for j in range(self.col):
                 self.ship_state[i][j] = containers[k]
                 k += 1
 
-    def __init_goal_state(self, loads, unloads) -> None:
-        """Inputs None, constructs map and fills dictionary with number of each type of container for starting state of ship,
-        constructs dictionary with goal state of number of each type of container. Returns None.
-        """
+    def __init_ship_state_names(self, cntr_names: List[List[str]]) -> None:
+        """Input 2d list of container names, constructs container objects and fills ship with containers. Returns None."""
+        self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
+        for i in range(self.row):
+            for j in range(self.col):
+                c = Container([-1, -1], -1, cntr_names[i][j], [self.row, self.col])
+                self.ship_state[i][j] = c
+
+    def __init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
+        """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
         for row in self.ship_state:
-            for cntr_obj in row:
-                cntr_name = cntr_obj.name
+            for cntr in row:
+                cntr_name = cntr.name
                 if cntr_name == "UNUSED" or cntr_name == "NAN":
                     continue
                 if cntr_name in self.goal_state.keys():
@@ -42,7 +60,7 @@ class Ship:
                 else:
                     self.goal_state[cntr_name] = 1
 
-        # Construct goal state by simulating ship state after all actions completed
+        # simulating ship state after all actions completed
         for cntr_name in loads:
             if cntr_name in self.goal_state.keys():
                 self.goal_state[cntr_name] += 1
@@ -60,19 +78,20 @@ class Ship:
 
     def is_goal_state(self) -> bool:
         """Inputs None, Returns if current ship_state matches goal_state."""
+        curr_state = {}
         for row in self.ship_state:
-            for cntr_obj in row:
-                cntr_name = cntr_obj.name
+            for cntr in row:
+                cntr_name = cntr.name
                 if cntr_name == "UNUSED" or cntr_name == "NAN":
                     continue
                 if cntr_name in self.curr_state.keys():
-                    self.curr_state[cntr_name] += 1
+                    curr_state[cntr_name] += 1
                 else:
-                    self.curr_state[cntr_name] = 1
-        return self.curr_state == self.goal_state
+                    curr_state[cntr_name] = 1
+        return curr_state == self.goal_state
 
     def __str__(self) -> str:
-        """Inputs None, prints ship names in grid format. Returns None."""
+        """Inputs None, prints container names in grid format. Returns None."""
         ret = ""
         for row in self.ship_state:
             for cntr in row:
@@ -81,7 +100,7 @@ class Ship:
         return ret
 
     def print_weights(self) -> None:
-        """Inputs None, prints ship weights in grid format. Returns None."""
+        """Inputs None, prints container weights in grid format. Returns None."""
         ret = ""
         for row in self.ship_state:
             for cntr in row:
@@ -98,14 +117,12 @@ class Ship:
         # find mass of left and right half
         left = 0
         right = 0
-        for i, row in enumerate(self.ship_state):
+        for row in self.ship_state:
             for j, cntr in enumerate(row):
-                if j >= 0 and j <= self.row / 2:
+                if j >= 0 and j < self.col / 2:
                     left += cntr.weight
                 else:
                     right += cntr.weight
-
-        print(left, right)
 
         # determine if ship is balanced
         if left < right and left >= 0.9 * right:
@@ -122,25 +139,17 @@ class Ship:
         ret = ""
         for i in range(self.row - 1, -1, -1):
             for j in range(self.col):
-                ret += self.ship_state[i][j].format_container()
+                ret += self.ship_state[i][j].get_manifest_format()
                 if not (i == 0 and j == self.col - 1):
                     ret += "\n"
-
         return ret
-
-    def get_ship_indices(self, cntr: Container):
-        """Inputs container. Returns contaier's position converted to ship indices as a list."""
-        return [self.row - cntr.x, cntr.y - 1]
-
-    def update_cntr_pos(self, cntr: Container, i: int, j: int) -> None:
-        """Inputs container's new indices in ship, updates position for container object. Returns None."""
-        cntr.set_pos(i + 1, self.row - j)
 
     def get_container_depth(self, cntr: Container) -> int:
         """Inputs container. Returns number of containers above current container."""
-        i, j = self.get_ship_indices(cntr)
+        i, j = cntr.ship_coord[5, 1][1, 2]
+        i -= 1  # start check at cell above current container
         count = 0
-        while i >= 0 and self.ship_state[i - 1][j] != "UNUSED":
+        while i >= 0 and self.ship_state[i][j] != "UNUSED":
             count += 1
             i -= 1
         return count

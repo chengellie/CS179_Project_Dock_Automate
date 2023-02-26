@@ -1,6 +1,7 @@
 from ship import Ship
 from shiputil import *
 from log import Log
+import csv
 
 
 def create_ship(manifest_filename, op_filename, outbound_filename):
@@ -12,26 +13,25 @@ def create_ship(manifest_filename, op_filename, outbound_filename):
         loads = f.readline().strip().split(",")
         unloads = f.readline().strip().split(",")
 
-    ret = Ship(manifest_cntnt, loads, unloads)
-    # ret.ship_state = [['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED'],
-    #                   ['NAN',    'Cat'   , 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'UNUSED', 'NAN']]
+    ship1 = Ship(manifest=manifest_cntnt, loads=loads, unloads=unloads)
 
-    print(ret)
-    # ret.print_weights()
-    # print(ret.is_balanced())
-    print(get_moves(ret, [7, 2], [7, 4]))
-    outbound_contents = ret.get_outbound_manifest()
+    cntr_names = []
+    with open("ShipState1.txt") as f:
+        cntr_names = list(csv.reader(f))
+
+    ship2 = Ship(cntr_names=cntr_names)
+
+    print(ship1)
+    print(ship2)
+    # ship1.print_weights()
+    # print(ship1.is_balanced())
+    print(get_moves(ship1, [7, 2], [7, 4]))
+    outbound_contents = ship1.get_outbound_manifest()
 
     with open(outbound_filename, "w+") as f:
         f.write(outbound_contents)
 
-    return ret
+    return ship1
 
 
 if __name__ == "__main__":

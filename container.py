@@ -1,34 +1,50 @@
+from typing import List
+
+
 class Container:
-    def __init__(self, pos: str, weight: int, name: str) -> None:
-        self.x = int(pos[1:3])
-        self.y = int(pos[4:6])
+    def __init__(
+        self, manifest_coord: List[int], weight: int, name: str, ship_size: List[int]
+    ) -> None:
+        self.manifest_coord = manifest_coord
+        self.ship_coord = [ship_size[0] - manifest_coord[0], manifest_coord[1] - 1]
+        self.ship_size = ship_size
         self.weight = weight
         self.name = name
 
-    def get_pos(self) -> str:
-        """Inputs None. Returns position in format [xx,yy]."""
-        return "[" + str(self.x).rjust(2, "0") + "," + str(self.y).rjust(2, "0") + "]"
-
     def __str__(self) -> str:
-        """Inputs None. Returns representation of container object as a string."""
-        # return (
-        #     f"Container {self.get_pos()}, Weight: {self.weight} kg, Name: {self.name}"
-        # )
+        """Inputs None. Returns 6-character shortened version of container name."""
         return self.get_shortened_name()
 
+    def get_manifest_format(self) -> str:
+        """Inputs None. Returns formatted container for outbound manifest."""
+        str_manifest_coord = (
+            "["
+            + str(self.manifest_coord[0]).rjust(2, "0")
+            + ","
+            + str(self.manifest_coord[1]).rjust(2, "0")
+            + "]"
+        )
+        str_weight = "{" + str(self.weight).rjust(5, "0") + "}"
+        return str_manifest_coord + ", " + str_weight + ", " + self.name
+
     def get_shortened_name(self) -> str:
-        """Inputs None. Returns shortened version of container name."""
+        """Inputs None. Returns 6-character shortened version of container name.
+        If name is shorter than 6-characters, appends spaces to fill in string up to 6 characters.
+        """
         return str(self.name)[:6].ljust(6, " ")
 
-    def get_str_weight(self) -> str:
-        """Inputs None. Returns weight as a 5-character string."""
-        return str(self.weight).rjust(5, "0")
+    def set_manifest_coord(self, new_manifest_coord: List[int]) -> None:
+        """Inputs manifest version of new coordinates, updates both manifest and ship coordinates. Returns None."""
+        self.manifest_coord = new_manifest_coord
+        self.ship_coord = [
+            self.ship_size[0] - new_manifest_coord[0],
+            new_manifest_coord[1] - 1,
+        ]
 
-    def format_container(self) -> str:
-        """Inputs None. Returns formatted container for outbound manifest."""
-        return self.get_pos() + ", {" + self.get_str_weight() + "}, " + self.name
-
-    def set_pos(self, new_x: int, new_y: int) -> None:
-        """Inputs new positions, updates x and y. Returns None."""
-        self.x = new_x
-        self.y = new_y
+    def set_ship_coord(self, new_ship_coord: List[int]) -> None:
+        """Inputs ship version of new coordinates, updates both manifest and ship coordinates. Returns None."""
+        self.ship_coord = new_ship_coord
+        self.manifest_coord = [
+            self.ship_size[0] - new_ship_coord[0],
+            new_ship_coord[1] + 1,
+        ]
