@@ -43,8 +43,8 @@ Member Functions
 | \_\_init_goal_state          | Construct goal_state dictionary                         |
 | \_\_str\_\_                  | Return grid representation for ship_state               |
 | print_weights                | Print grid representation of container weights          |
-| is_balanced                  | Test whether ship is balanced                           |
-| is_goal_state                | Test whether current state is goal state                |
+| is_balanced                  | Check whether ship is balanced                          |
+| is_goal_state                | Check whether current state is goal state               |
 | get_outbound_manifest        | Return contents for outbound manifest                   |
 | get_container_depth          | Return number of containers on top of a given container |
 | get_ship_columns             | Return single column or every column of ship as a list  |
