@@ -153,3 +153,19 @@ class Ship:
             count += 1
             i -= 1
         return count
+
+    """Gets list of all containers of all or a single column"""
+    def get_ship_columns(self, indx: int = -1):
+        rowlength = len(self.ship_state[0])
+        columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
+
+        for row in self.ship_state:
+            if indx == -1:
+                for i in range(0, rowlength):
+                    columns[i].append(row[i])
+            else:
+                columns[0].append(row[indx])
+
+
+        return columns
+

@@ -7,6 +7,8 @@ class TestSuite:
         self.manifest = manifest
         self.logcase = logcase
         self.logfile = Log(logcase[:-4])
+        self.ship = create_ship(self.manifest)   # TODO: Add load, unloads
+        # TODO: Run program
 
     """Compare for correctness between produced log file and test log file"""
     def __compare_logs(self) -> [bool, str]:  # TODO: Maybe change to compare # of comments and actual texts written?
@@ -24,6 +26,12 @@ class TestSuite:
     def __check_balance(self) -> [bool, float, float]:  # TODO: Compute total weights, comparison, and printing of weights
         left = 0.0
         right = 0.0
+        columns = s.get_ship_columns()
+
+        for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
+            left += sum([c.weight for c in col[0]])
+            right += sum([c.weight for c in col[1]])
+        print(leftWeight, rightWeight)
         # TODO: Go through and check left and right to see if actually balanced (Without using isBalanced())
         return False, left, right
         
@@ -39,8 +47,6 @@ class TestSuite:
             print(f"Test Run {run + 1}")
             start_time = datetime.now()
 
-            self.ship = create_ship(self.manifest)   # TODO: Add load, unloads
-            # TODO: Run program
             print(f"Time: {(datetime.now() - start_time).total_seconds()}s")
 
             # Test Log Files
@@ -63,8 +69,8 @@ class TestSuite:
 
         print("#" * 15)
             
-t = TestSuite("shipcasetest.txt", "LogCase1.txt")
-t.test(3, "load_unload.txt")
+# t = TestSuite("shipcasetest.txt", "LogCase1.txt")
+# t.test(3, "load_unload.txt")
 
 """
 Test Suite 1 - ShipCase1.txt
@@ -73,3 +79,19 @@ Offload: [Cat]
 Offload: [Dog]
 Onload: [Bird, Bird]
 """
+
+s = create_ship(
+        "ShipCase/shipcasetest.txt",
+        "load_unload.txt",
+        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    )
+# columns = s.get_ship_columns(11)
+# print([c.name for c in columns[0]])
+
+columns = s.get_ship_columns()
+leftWeight = 0
+rightWeight = 0
+for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
+    leftWeight += sum([c.weight for c in col[0]])
+    rightWeight += sum([c.weight for c in col[1]])
+print(leftWeight, rightWeight)
