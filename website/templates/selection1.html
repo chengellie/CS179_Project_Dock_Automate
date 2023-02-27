@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %} Selection {% endblock %}
+{% block content %}
+
+<div class="w3-center">
+    <br>
+    <a class="w3-button w3-theme">Load Container</a>
+    <a class="w3-button w3-theme">Unload Container</a>
+    <a class="w3-button w3-theme">Balance Ship</a>
+</div>
+
+<div class="w3-container">
+    <div class="w3-center">
+        <h2>Container Action List</h2>
+    </div>
+    <div class="w3-responsive w3-card-4">
+        <table class="w3-table w3-striped w3-bordered">
+        <thead>
+            <tr class="w3-theme">
+                <th>Item Name</th>
+                <th>Amount</th>
+                <th>Load/Unload</th>
+                <th>Delete?</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="w3-center">
+    <br><br>
+    <a class="w3-button w3-theme" href="/table">GO</a>
+    <br><br>
+</div>
+
+{% endblock %}

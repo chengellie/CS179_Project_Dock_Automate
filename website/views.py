@@ -3,6 +3,7 @@ from ship import Ship
 from shiputil import *
 
 home_page = Blueprint("home_page", __name__)
+selection_1 = Blueprint("selection_1", __name__)
 tables = Blueprint("tables", __name__)
 
 
@@ -22,6 +23,9 @@ def create_ship(manifest_filename, op_filename):
 def home():
     return render_template("home.html")
 
+@selection_1.route("/")
+def selection1():
+    return render_template("selection1.html")
 
 @tables.route("/")
 def table():
