@@ -1,14 +1,31 @@
 {% extends "base.html" %}
 {% block title %} Selection {% endblock %}
 {% block content %}
-
-<div class="w3-center">
+<form class="w3-container w3-center" method="post">
+    <!-- <br>
+    <label class="w3-text-blue-grey"><b>Item to Unload</b></label>
+    <input class="w3-input w3-border" type="text">
+     
+    <label class="w3-text-blue-grey"><b>Item Count</b></label>
+    <input class="w3-input w3-border" type="number">
     <br>
-    <a class="w3-button w3-theme" href="/load">Load Container</a>
-    <a class="w3-button w3-theme" href="/unload">Unload Container</a>
-    <a class="w3-button w3-theme">Balance Ship</a>
-</div>
+    <button class="w3-btn w3-blue-grey">Submit Item</button>
+    <br> -->
+    <br>
+    {% for i in range(8) %}
+        <div>
+            {% for j in range(12)%}
+            <input type="checkbox" name="unload" value="{{content[i][j]}}_{{i}}_{{j}}">
+            {% endfor %}   
+        </div>
+    {% endfor %}
+    
+    <br>
+    <button class="w3-btn w3-blue-grey">Submit Selection</button>
+    <br> 
 
+</form>
+<br>
 <div class="w3-container">
     <div class="w3-center">
         <h2>Container Action List</h2>
@@ -22,6 +39,7 @@
                 <th>Load/Unload</th>
             </tr>
         </thead>
+        <tbody>
             {%for i in range(row)%}
             <tr>
                 {% for j in range(3)%}
@@ -29,8 +47,6 @@
                     {% endfor %}
                 </tr>
             {% endfor %}
-        <tbody>
-
         </tbody>
         </table>
     </div>
@@ -38,8 +54,8 @@
 
 <div class="w3-center">
     <br><br>
-    <a class="w3-button w3-theme" href="/table">GO</a>
+    <a class="w3-button w3-theme" href="/home-selection">Back</a>
     <br><br>
 </div>
-
+<br><br>
 {% endblock %}

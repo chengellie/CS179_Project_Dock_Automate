@@ -1,10 +1,15 @@
-from flask import Blueprint, render_template, json
+from flask import Blueprint, render_template, json, request
+import csv
 from ship import Ship
 from shiputil import *
+import os
+import sys
+
 
 home_page = Blueprint("home_page", __name__)
 selection_1 = Blueprint("selection_1", __name__)
 tables = Blueprint("tables", __name__)
+unloading = Blueprint("unloading", __name__)
 
 
 def create_ship(manifest_filename, op_filename):
@@ -25,7 +30,28 @@ def home():
 
 @selection_1.route("/")
 def selection1():
-    return render_template("selection1.html")
+    csvfile = open('data/action_list.csv')
+    data = list(csv.reader(csvfile,delimiter=","))
+    row = len(data)
+    return render_template("selection1.html", data = data, row = row)
+
+@unloading.route("/", methods = ['GET','POST'])
+def unload():
+    
+    ship = create_ship("ShipCase/ShipCase1.txt", "load_unload.txt")
+    item = ship.ship_state
+    if request.method == 'POST':
+        unload = request.form.getlist('unload')
+        with open('data/action_list.csv', mode = 'a') as csvfile:
+            file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for i in unload:
+                file_writer.writerow([i,1,'Unload'])
+
+    csvfile = open('data/action_list.csv')
+    data = list(csv.reader(csvfile,delimiter=","))
+    row = len(data)
+
+    return render_template("unload.html", content = item, data = data, row = row)
 
 @tables.route("/")
 def table():
