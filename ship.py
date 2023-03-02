@@ -3,22 +3,43 @@ from typing import List, Optional
 
 
 class Ship:
-    def __init__(
-        self,
-        manifest: Optional[List[str]] = None,
-        loads: Optional[list] = [],
-        unloads: Optional[list] = [],
-        cntr_names: Optional[List[List[str]]] = None,
+    def __init__(self, 
+        manifest:str or List[str] or List[Container],
+        loads:List[str]=[], 
+        unloads:List[str]=[]
     ) -> None:
         self.ship_state = []
         self.goal_state = {}
         self.row = 8
         self.col = 12
-        if manifest != None and cntr_names == None:
-            self.__init_ship_state_manifest(manifest)
-        elif manifest == None and cntr_names != None:
-            self.__init_ship_state_names(cntr_names)
-        self.__init_goal_state(loads, unloads)
+        if type(manifest) == str:   # read manifest from scratch
+            with open(manifest) as f:
+                containers = [line for line in f.readlines()]
+            self.__init_ship_state_manifest(containers)
+        else:   # list
+            if not manifest:    # empty list
+                raise Exception("Expected non-empty list of containers")
+            elif isinstance(manifest[0], str):
+                self.__init_ship_state_manifest(manifest)
+            else:
+                self.ship_state = manifest
+        
+    # def __init__(
+    #     self,
+    #     manifest: Optional[List[str] or List[Container]] = None,
+    #     loads: Optional[list] = [],
+    #     unloads: Optional[list] = [],
+    #     cntr_names: Optional[List[List[str]]] = None,
+    # ) -> None:
+    #     self.ship_state = []
+    #     self.goal_state = {}
+    #     self.row = 8
+    #     self.col = 12
+    #     if manifest != None and cntr_names == None:
+    #         self.__init_ship_state_manifest(manifest)
+    #     elif manifest == None and cntr_names != None:
+    #         self.__init_ship_state_names(cntr_names)
+    #     self.__init_goal_state(loads, unloads)
 
     def __init_ship_state_manifest(self, manifest: List[str]) -> None:
         """Input manifest, constructs container objects and fills ship with containers. Returns None."""
@@ -165,7 +186,6 @@ class Ship:
                     columns[i].append(row[i])
             else:
                 columns[0].append(row[indx])
-
 
         return columns
 

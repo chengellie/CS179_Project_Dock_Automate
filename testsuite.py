@@ -1,6 +1,7 @@
 from log import Log
-from main import create_ship
+# from main import create_ship
 from datetime import datetime
+from ship import Ship
 
 class TestSuite:
     def __init__(self, manifest, logcase):
@@ -80,15 +81,22 @@ Offload: [Dog]
 Onload: [Bird, Bird]
 """
 
-s = create_ship(
-        "ShipCase/shipcasetest.txt",
-        "load_unload.txt",
-        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-    )
+# s = create_ship(
+#         "ShipCase/shipcasetest.txt",
+#         "load_unload.txt",
+#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+#     )
 # columns = s.get_ship_columns(11)
 # print([c.name for c in columns[0]])
 
+s = Ship("ShipCase/shipcasetest.txt", ["Bat", "Cat"], ["Dog"])
+
 columns = s.get_ship_columns()
+print(s)
+
+a = Ship(s.ship_state)
+print(a)
+
 leftWeight = 0
 rightWeight = 0
 for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
