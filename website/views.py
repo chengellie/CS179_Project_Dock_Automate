@@ -28,11 +28,12 @@ def create_ship(manifest_filename, op_filename):
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
+    global current_user
     if request.method == 'POST':
         global current_user
         current_user = request.form.get('current_user')
         return redirect('/home-selection')
-    return render_template("home.html")
+    return render_template("home.html",user = current_user)
 
 @selection_1.route("/", methods = ['GET','POST'])
 def selection1():
