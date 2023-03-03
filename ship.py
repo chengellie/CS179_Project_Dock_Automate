@@ -23,6 +23,8 @@ class Ship:
                 self.__init_ship_state_manifest(manifest)
             else:
                 self.ship_state = manifest
+
+        self.__init_goal_state(loads, unloads)
         
     # def __init__(
     #     self,

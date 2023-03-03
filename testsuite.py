@@ -9,6 +9,7 @@ class TestSuite:
         self.logcase = logcase
         self.logfile = Log(logcase[:-4])
         self.ship = create_ship(self.manifest)   # TODO: Add load, unloads
+        self.columns = self.ship.get_ship_columns() # get columns of ship
         # TODO: Run program
 
     """Compare for correctness between produced log file and test log file"""
@@ -27,16 +28,17 @@ class TestSuite:
     def __check_balance(self) -> [bool, float, float]:  # TODO: Compute total weights, comparison, and printing of weights
         left = 0.0
         right = 0.0
-        columns = s.get_ship_columns()
 
-        for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
+        for col in zip(self.columns[:len(self.columns)//2], self.columns[len(self.columns)//2:]):
             left += sum([c.weight for c in col[0]])
             right += sum([c.weight for c in col[1]])
-        print(leftWeight, rightWeight)
+
+        if min(left, right) >= max(left, right) * 0.9:
+            return True, left, right
         # TODO: Go through and check left and right to see if actually balanced (Without using isBalanced())
         return False, left, right
         
-    def test(self, num_runs, transferlist):
+    def test(self, num_runs:int=3):
         print("#" * 15)
         print(f"Manifest: {self.manifest}")
         print(f"Transfer List: {transferlist}")
@@ -52,7 +54,7 @@ class TestSuite:
 
             # Test Log Files
             print("\tLog File:", end=" ")
-            with self.compare_logs() as (passed, failline):
+            with self.__compare_logs() as (passed, failline):
                 if passed:
                     print("PASSED")
                 else:
@@ -60,10 +62,11 @@ class TestSuite:
 
             # Test Ship Balance
             print("\tShip Balancing:", end=" ")
-            if self.__check_balance(ship):
-                print("PASSED")
-            else:
-                print("FAILED")
+            with self.__check_balance(ship) as [balanced, left, right]:
+                if balanced:
+                    print("PASSED")
+                else:
+                    print(f"FAILED -> {left} {right}: ")
 
             # Test Ship Outbound (Load/Unload Correctness)
             outboundcase = create_ship(f"{self.manifest}OUTBOUND.txt")
@@ -89,17 +92,21 @@ Onload: [Bird, Bird]
 # columns = s.get_ship_columns(11)
 # print([c.name for c in columns[0]])
 
-s = Ship("ShipCase/shipcasetest.txt", ["Bat", "Cat"], ["Dog"])
+# s = Ship("ShipCase/shipcasetest.txt", ["Bat", "Cat"], ["Dog"])
 
-columns = s.get_ship_columns()
-print(s)
+# # columns = s.get_ship_columns()
+# print(s)
 
-a = Ship(s.ship_state)
-print(a)
+# a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
+# print(a)
+# print(a.goal_state)
+Log("")
 
-leftWeight = 0
-rightWeight = 0
-for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
-    leftWeight += sum([c.weight for c in col[0]])
-    rightWeight += sum([c.weight for c in col[1]])
-print(leftWeight, rightWeight)
+t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
+
+# leftWeight = 0
+# rightWeight = 0
+# for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
+#     leftWeight += sum([c.weight for c in col[0]])
+#     rightWeight += sum([c.weight for c in col[1]])
+# print(leftWeight, rightWeight)
