@@ -13,7 +13,7 @@ class TestSuite:
         # TODO: Run program
 
     """Compare for correctness between produced log file and test log file"""
-    def __compare_logs(self) -> [bool, str]:  # TODO: Maybe change to compare # of comments and actual texts written?
+    def compare_logs(self) -> [bool, str]:  # TODO: Maybe change to compare # of comments and actual texts written?
         logdata = self.logfile.readlog()
         for (i, j) in zip(self.testlogcase, logdata):
             if i != j:
@@ -21,11 +21,11 @@ class TestSuite:
         return True, None
 
     """Check all container placements are valid"""
-    def __check_placement(self) -> [bool, str]:    # TODO: Check valid placement, asymetrical ship (non-container), and output issues
+    def check_placement(self) -> [bool, str]:    # TODO: Check valid placement, asymetrical ship (non-container), and output issues
         return False
 
     """Check ship is balanced left and right"""
-    def __check_balance(self) -> [bool, float, float]:  # TODO: Compute total weights, comparison, and printing of weights
+    def check_balance(self) -> [bool, float, float]:  # TODO: Compute total weights, comparison, and printing of weights
         left = 0.0
         right = 0.0
 
@@ -49,12 +49,12 @@ class TestSuite:
         for run in range(0, num_runs):
             print(f"Test Run {run + 1}")
             start_time = datetime.now()
-
+            # Test to solve
             print(f"Time: {(datetime.now() - start_time).total_seconds()}s")
 
             # Test Log Files
             print("\tLog File:", end=" ")
-            with self.__compare_logs() as (passed, failline):
+            with self.compare_logs() as (passed, failline):
                 if passed:
                     print("PASSED")
                 else:
@@ -62,7 +62,7 @@ class TestSuite:
 
             # Test Ship Balance
             print("\tShip Balancing:", end=" ")
-            with self.__check_balance(ship) as [balanced, left, right]:
+            with self.check_balance(ship) as [balanced, left, right]:
                 if balanced:
                     print("PASSED")
                 else:
@@ -92,17 +92,19 @@ Onload: [Bird, Bird]
 # columns = s.get_ship_columns(11)
 # print([c.name for c in columns[0]])
 
-# s = Ship("ShipCase/shipcasetest.txt", ["Bat", "Cat"], ["Dog"])
+s = Ship("ShipCase/shipcasetest.txt")
+# print(s)
 
 # # columns = s.get_ship_columns()
 # print(s)
 
-# a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
-# print(a)
+a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
+print(a)
+print(a.cntrs_in_row)
 # print(a.goal_state)
-Log("")
+# Log("")
 
-t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
+# t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
 
 # leftWeight = 0
 # rightWeight = 0

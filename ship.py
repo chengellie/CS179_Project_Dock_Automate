@@ -1,9 +1,10 @@
 from container import Container
 from typing import List, Optional
 
+# modify or remove get columns, unneeded. instead have search and find depth go rowwise instead. (search algo will mark matching containers. list stores them in depth order (will shift accordingly)
 
 class Ship:
-    def __init__(self, 
+    def __init__(self,  
         manifest:str or List[str] or List[Container],
         loads:List[str]=[], 
         unloads:List[str]=[]
@@ -12,6 +13,7 @@ class Ship:
         self.goal_state = {}
         self.row = 8
         self.col = 12
+        self.cntrs_in_row = []
         if type(manifest) == str:   # read manifest from scratch
             with open(manifest) as f:
                 containers = [line for line in f.readlines()]
@@ -24,24 +26,16 @@ class Ship:
             else:
                 self.ship_state = manifest
 
+        # get count of all containers in a row from bottom to top
+        for row in self.ship_state:
+            cntr_row = {}
+            for cntr in row:
+                if cntr.name not in cntr_row:
+                    cntr_row[cntr.name] = 0
+                cntr_row[cntr.name] += 1
+            self.cntrs_in_row.append(cntr_row)
+
         self.__init_goal_state(loads, unloads)
-        
-    # def __init__(
-    #     self,
-    #     manifest: Optional[List[str] or List[Container]] = None,
-    #     loads: Optional[list] = [],
-    #     unloads: Optional[list] = [],
-    #     cntr_names: Optional[List[List[str]]] = None,
-    # ) -> None:
-    #     self.ship_state = []
-    #     self.goal_state = {}
-    #     self.row = 8
-    #     self.col = 12
-    #     if manifest != None and cntr_names == None:
-    #         self.__init_ship_state_manifest(manifest)
-    #     elif manifest == None and cntr_names != None:
-    #         self.__init_ship_state_names(cntr_names)
-    #     self.__init_goal_state(loads, unloads)
 
     def __init_ship_state_manifest(self, manifest: List[str]) -> None:
         """Input manifest, constructs container objects and fills ship with containers. Returns None."""
@@ -59,6 +53,7 @@ class Ship:
         # fill in 2d list for ship_state with containers
         k = 0
         for i in range(self.row - 1, -1, -1):
+            cntr_row = {}
             for j in range(self.col):
                 self.ship_state[i][j] = containers[k]
                 k += 1
@@ -177,17 +172,22 @@ class Ship:
             i -= 1
         return count
 
-    """Gets list of all containers of all or a single column"""
-    def get_ship_columns(self, indx: int = -1):
-        rowlength = len(self.ship_state[0])
-        columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
+    """Takes in a list of containers and finds the columns with containers closest to the top in its column via a scan"""
+    def col_of_unloads(self, cntrs: [str]):
+        columns = []    # list of dictionaries: key = column #, values = row of columns
+        return 
 
-        for row in self.ship_state:
-            if indx == -1:
-                for i in range(0, rowlength):
-                    columns[i].append(row[i])
-            else:
-                columns[0].append(row[indx])
+    # """Gets list of all containers of all or a single column"""
+    # def get_ship_columns(self, indx: int = -1):
+    #     rowlength = len(self.ship_state[0])
+    #     columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
 
-        return columns
+    #     for row in self.ship_state:
+    #         if indx == -1:
+    #             for i in range(0, rowlength):
+    #                 columns[i].append(row[i])
+    #         else:
+    #             columns[0].append(row[indx])
+
+    #     return columns
 
