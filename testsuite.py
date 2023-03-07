@@ -77,7 +77,31 @@ class TestSuite:
 # t.test(3, "load_unload.txt")
 
 """
+Test Suite 0.1 - shipcasetest.txt
+Offload: [Cat]
+    -> Onload: [Bat]
+Offload: [Dog]
+Onload: [Bird, Bird]
+"""
+
+"""
+Test Suite 0.2 - shipcasetest2.txt
+Offload: [Cat]
+    -> Onload: [Bat]
+Offload: [Dog]
+Onload: [Bird, Bird]
+"""
+
+"""
 Test Suite 1 - ShipCase1.txt
+Offload: [Cat]
+    -> Onload: [Bat]
+Offload: [Dog]
+Onload: [Bird, Bird]
+"""
+
+"""
+Test Suite 2 - ShipCase2.txt
 Offload: [Cat]
     -> Onload: [Bat]
 Offload: [Dog]
@@ -101,6 +125,16 @@ s = Ship("ShipCase/shipcasetest.txt")
 a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
 print(a)
 print(a.cntrs_in_row)
+print(a.top_columns)
+
+test_cntr = a.ship_state[6][1]
+print(test_cntr)
+print(test_cntr.ship_coord)
+
+test_cntr = a.find_best_cntr(test_cntr)
+print(test_cntr)
+print(test_cntr.ship_coord)
+# print(s.ship_state[7][1].ship_coord)
 # print(a.goal_state)
 # Log("")
 
