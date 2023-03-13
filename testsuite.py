@@ -77,6 +77,63 @@ class TestSuite:
 # t.test(3, "load_unload.txt")
 
 """
+Auxiliary Testing - All Functions
+"""
+
+# s = create_ship(
+#         "ShipCase/shipcasetest.txt",
+#         "load_unload.txt",
+#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+#     )
+# columns = s.get_ship_columns(11)
+# print([c.name for c in columns[0]])
+
+s = Ship("ShipCase/shipcasetest.txt")
+# print(s)
+
+# # columns = s.get_ship_columns()
+# print(s)
+
+a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
+print(a)
+print(a.top_columns)
+print(a.cntrs_in_row[6])
+
+# Add a container
+test_cntr = a.ship_state[7][1]
+a.add_cntr(test_cntr, 11)
+
+print(a)
+print(a.top_columns)
+print(a.cntrs_in_row[6])
+
+# Remove a container
+for i in range(0, 3):
+    print(a.cntrs_in_row[5-1])
+    rm_cntr = a.remove_cntr(4)
+
+    print(a)
+    print(a.top_columns)
+    print(a.cntrs_in_row[5-1])
+    print(rm_cntr)
+
+# test_cntr = a.find_best_cntr(test_cntr)
+# print(test_cntr)
+# print(test_cntr.ship_coord)
+# print(s.ship_state[7][1].ship_coord)
+# print(a.goal_state)
+# Log("")
+
+# t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
+
+# leftWeight = 0
+# rightWeight = 0
+# for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
+#     leftWeight += sum([c.weight for c in col[0]])
+#     rightWeight += sum([c.weight for c in col[1]])
+# print(leftWeight, rightWeight)
+
+"""
 Test Suite 0.1 - shipcasetest.txt
 Offload: [Cat]
     -> Onload: [Bat]
@@ -108,41 +165,3 @@ Offload: [Dog]
 Onload: [Bird, Bird]
 """
 
-# s = create_ship(
-#         "ShipCase/shipcasetest.txt",
-#         "load_unload.txt",
-#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-#     )
-# columns = s.get_ship_columns(11)
-# print([c.name for c in columns[0]])
-
-s = Ship("ShipCase/shipcasetest.txt")
-# print(s)
-
-# # columns = s.get_ship_columns()
-# print(s)
-
-a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
-print(a)
-print(a.cntrs_in_row)
-print(a.top_columns)
-
-test_cntr = a.ship_state[6][1]
-print(test_cntr)
-print(test_cntr.ship_coord)
-
-test_cntr = a.find_best_cntr(test_cntr)
-print(test_cntr)
-print(test_cntr.ship_coord)
-# print(s.ship_state[7][1].ship_coord)
-# print(a.goal_state)
-# Log("")
-
-# t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
-
-# leftWeight = 0
-# rightWeight = 0
-# for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
-#     leftWeight += sum([c.weight for c in col[0]])
-#     rightWeight += sum([c.weight for c in col[1]])
-# print(leftWeight, rightWeight)

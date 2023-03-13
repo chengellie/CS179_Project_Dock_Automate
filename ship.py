@@ -193,3 +193,31 @@ class Ship:
                         unload_cntr = self.ship_state[i][pot_cntr[1]]
 
         return unload_cntr
+
+    def add_cntr(self, cntr:Container, col:int) -> None:
+        row = self.top_columns[col]
+        cntr.ship_coord = [row, col]
+        
+        # TODO: Check if full
+        # Mark container coord as used
+        self.ship_state[row][col] = cntr
+        self.top_columns[col] -= 1
+        self.cntrs_in_row[row]["UNUSED"].remove([row,col])
+        self.cntrs_in_row[row][cntr.name].append([row, col])
+    
+    def remove_cntr(self, col:int) -> Container:
+        # TODO: Check if empty
+
+        # Get container being removed
+        self.top_columns[col] += 1
+        row = self.top_columns[col]
+        removed_cntr = self.ship_state[row][col]
+
+        # Mark top coord of column unused
+        self.ship_state[row][col] = Container([row, col], 0, "UNUSED", [self.row, self.col])
+        self.cntrs_in_row[row]["UNUSED"].append([row,col])
+        self.cntrs_in_row[row][removed_cntr.name].remove([row, col])
+
+        return removed_cntr
+
+        
