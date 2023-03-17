@@ -10,6 +10,7 @@ home_page = Blueprint("home_page", __name__)
 selection_1 = Blueprint("selection_1", __name__)
 tables = Blueprint("tables", __name__)
 unloading = Blueprint("unloading", __name__)
+loading = Blueprint("loading", __name__)
 
 current_user = ''
 current_ship = ''
@@ -24,7 +25,6 @@ def create_ship(manifest_filename, op_filename):
         unloads = f.readline().strip().split(",")
     ret = Ship(manifest_cntnt, loads, unloads)
     return ret
-
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
@@ -60,6 +60,24 @@ def unload():
     row = len(data)
 
     return render_template("unload.html", content = item, data = data, row = row, user = current_user)
+
+@loading.route("/", methods = ['GET','POST'])
+def load():
+    global current_user
+
+    if request.method == 'POST':
+        load_name = request.form.get('item_name')
+        load_weight = request.form.get('item_weight')
+        load_count = request.form.get('item_count')
+        with open('data/action_list.csv', mode = 'a') as csvfile:
+            file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file_writer.writerow([load_name,load_count,'Load'])
+            
+    csvfile = open('data/action_list.csv')
+    data = list(csv.reader(csvfile,delimiter=","))
+    row = len(data)
+
+    return render_template('load.html', data = data, row = row, user = current_user)
 
 @tables.route("/")
 def table():
