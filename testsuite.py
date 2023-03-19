@@ -2,6 +2,7 @@ from log import Log
 # from main import create_ship
 from datetime import datetime
 from ship import Ship
+import copy
 
 class TestSuite:
     def __init__(self, manifest, logcase):
@@ -94,7 +95,8 @@ s = Ship("ShipCase/shipcasetest.txt")
 # # columns = s.get_ship_columns()
 # print(s)
 
-a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
+a = copy.deepcopy(s)
+# a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
 print(a)
 print(a.top_columns)
 print(a.cntrs_in_row[6])
@@ -116,6 +118,13 @@ for i in range(0, 3):
     print(a.top_columns)
     print(a.cntrs_in_row[5-1])
     print(rm_cntr)
+
+s.ship_state[7][3].name = "Cake"
+print(a)
+print(a.goal_state)
+print(s)
+print(s.goal_state)
+
 
 # test_cntr = a.find_best_cntr(test_cntr)
 # print(test_cntr)
