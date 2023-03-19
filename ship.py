@@ -3,24 +3,37 @@ from typing import List, Optional
 
 
 class Ship:
-    def __init__(
-        self,
-        manifest: Optional[List[str]] = None,
-        loads: Optional[list] = [],
-        unloads: Optional[list] = [],
-        cntr_names: Optional[List[List[str]]] = None,
-    ) -> None:
-        self.ship_state = []
+    def __init__(self, ship_state: Optional[List[Container]] = []) -> None:
+        self.ship_state = ship_state
         self.goal_state = {}
         self.row = 8
         self.col = 12
-        if manifest != None and cntr_names == None:
-            self.__init_ship_state_manifest(manifest)
-        elif manifest == None and cntr_names != None:
-            self.__init_ship_state_names(cntr_names)
-        self.__init_goal_state(loads, unloads)
+        self.crane_loc = -1
+        self.crane_mode = None
+        self.moves = []
 
-    def __init_ship_state_manifest(self, manifest: List[str]) -> None:
+    # def __init__(
+    #     self,
+    #     ship_state: Optional[List[]] = [],
+    #     manifest: Optional[List[str]] = None,
+    #     loads: Optional[list] = [],
+    #     unloads: Optional[list] = [],
+    #     cntr_names: Optional[List[List[str]]] = None,
+    #     crane_mode: str = "get",
+    # ) -> None:
+    #     self.ship_state = []
+    #     self.goal_state = {}
+    #     self.row = 8
+    #     self.col = 12
+    #     self.crane_loc = -1
+    #     self.crane_mode = crane_mode
+    #     if manifest != None and cntr_names == None:
+    #         self.__init_ship_state_manifest(manifest)
+    #     elif manifest == None and cntr_names != None:
+    #         self.__init_ship_state_names(cntr_names)
+    #     self.__init_goal_state(loads, unloads)
+
+    def init_ship_state_manifest(self, manifest: List[str]) -> None:
         """Input manifest, constructs container objects and fills ship with containers. Returns None."""
         self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
 
@@ -40,15 +53,15 @@ class Ship:
                 self.ship_state[i][j] = containers[k]
                 k += 1
 
-    def __init_ship_state_names(self, cntr_names: List[List[str]]) -> None:
-        """Input 2d list of container names, constructs container objects and fills ship with containers. Returns None."""
-        self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
-        for i in range(self.row):
-            for j in range(self.col):
-                c = Container([-1, -1], -1, cntr_names[i][j], [self.row, self.col])
-                self.ship_state[i][j] = c
+    # def __init_ship_state_names(self, cntr_names: List[List[str]]) -> None:
+    #     """Input 2d list of container names, constructs container objects and fills ship with containers. Returns None."""
+    #     self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
+    #     for i in range(self.row):
+    #         for j in range(self.col):
+    #             c = Container([-1, -1], -1, cntr_names[i][j], [self.row, self.col])
+    #             self.ship_state[i][j] = c
 
-    def __init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
+    def init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
         """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
         for row in self.ship_state:
             for cntr in row:
@@ -109,6 +122,14 @@ class Ship:
             ret += "\n"
         print(ret)
 
+    def ship_str(self) -> str:
+        """Inputs None, Returns ship_state as a string."""
+        ret = ""
+        for row in self.ship_state:
+            for cntr in row:
+                ret += cntr
+        return ret
+
     def is_balanced(self) -> bool:
         """Inputs None, Returns if ship is balanced.
         Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
@@ -154,8 +175,12 @@ class Ship:
             i -= 1
         return count
 
-    """Gets list of all containers of all or a single column"""
+    def is_empty_col(self, col: int):
+        """Inputs column number. Returns whether column has any containers."""
+        return self.ship_state[self.row - 1][col] == "UNUSED"
+
     def get_ship_columns(self, indx: int = -1):
+        """Gets list of all containers of all or a single column. Returns None."""
         rowlength = len(self.ship_state[0])
         columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
 
@@ -166,6 +191,19 @@ class Ship:
             else:
                 columns[0].append(row[indx])
 
-
         return columns
 
+    def copy_ship(self):
+        return self.deep_copy()
+
+    def move_crane(self, col: int):
+        """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
+        if self.crane_mode == "get":
+            new_crane_mode = "put"
+        else:
+            new_crane_mode = "get"
+
+        new_ship = Ship(self.ship_state)
+        new_ship = copy_ship()
+        new_ship.crane_loc = col
+        return new_ship
