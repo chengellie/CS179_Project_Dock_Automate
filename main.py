@@ -1,46 +1,30 @@
+import csv
+import copy
+from typing import Optional, Set
 from ship import Ship
+from search import *
 from shiputil import *
 from log import Log
-import csv
-
-
-def create_ship(manifest_filename, op_filename, outbound_filename):
-    """Input filename of manifest, parses file contents. Returns ship object."""
-    # https://www.pythontutorial.net/python-basics/python-read-text-file/
-    with open(manifest_filename) as f:
-        manifest_cntnt = [line for line in f.readlines()]
-    with open(op_filename) as f:
-        loads = f.readline().strip().split(",")
-        unloads = f.readline().strip().split(",")
-
-    ship1 = Ship(manifest=manifest_cntnt, loads=loads, unloads=unloads)
-
-    cntr_names = []
-    with open("ShipState1.txt") as f:
-        cntr_names = list(csv.reader(f))
-
-    ship2 = Ship(cntr_names=cntr_names)
-
-    print(ship1)
-    print(ship2)
-    # ship1.print_weights()
-    # print(ship1.is_balanced())
-    print(get_moves(ship1, [7, 2], [7, 4]))
-    outbound_contents = ship1.get_outbound_manifest()
-
-    with open(outbound_filename, "w+") as f:
-        f.write(outbound_contents)
-
-    return ship1
 
 
 if __name__ == "__main__":
-    create_ship(
-        "ShipCase/shipcasetest.txt",
+    ship = create_ship(
+        "ShipCase/ShipCase4.txt",
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )
 
+    # print("search debug")
+    # ship_copy = copy.deepcopy(ship)
+    # print(ship.is_empty_col(0))
+    # ship_copy.move_cntr(1, 11)
+    # ship_copy.move_cntr(2, 11)
+    # print(ship.is_full_col(1))
+    sol = uniform_cost_balance(ship)
+    print(sol.moves)
+    sol.print_weights()
+    # if sol != None:
+    #     print(sol.moves)
     # Keep these commented unless testing logs
     # log = Log("testlog")
     # log.writelog("Testing Log")

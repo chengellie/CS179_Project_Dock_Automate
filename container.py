@@ -34,6 +34,10 @@ class Container:
         """
         return str(self.name)[:6].ljust(6, " ")
 
+    def get_manifest_coord(self) -> List[int]:
+        "Inputs None. Returns manifest version of coordinates as a list."
+        return [self.manifest_coord[0], self.manifest_coord[1]]
+
     def set_manifest_coord(self, new_manifest_coord: List[int]) -> None:
         """Inputs manifest version of new coordinates, updates both manifest and ship coordinates. Returns None."""
         self.manifest_coord = new_manifest_coord
