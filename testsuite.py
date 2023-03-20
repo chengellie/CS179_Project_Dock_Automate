@@ -98,7 +98,7 @@ print(a.cntrs_in_row[6])
 print("============================== Add Cat")
 test_cntr = a.ship_state[6][4]
 print(a.cntrs_in_row[5])
-a.add_cntr(test_cntr, 11)
+a.add_cntr(copy.deepcopy(test_cntr), 11)
 print(a)
 print(a.top_columns)
 print(a.cntrs_in_row[6])
@@ -106,13 +106,14 @@ print(a.cntrs_in_row[6])
 # Remove a container
 print("============================== Remove 4 Containers From Col 4")
 for i in range(0, 4):
-    rm_cntr = a.remove_cntr(11)
+    rm_cntr = a.remove_cntr(4)
 
     print(f"Removed {rm_cntr}")
 
 print(a)
 print(a.top_columns)
 print(a.cntrs_in_row[4])
+print(a.get_container_depth(test_cntr))
 # test_cntr = a.find_best_cntr(test_cntr)
 # print(test_cntr)
 # print(test_cntr.ship_coord)

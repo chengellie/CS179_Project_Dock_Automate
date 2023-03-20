@@ -162,13 +162,15 @@ class Ship:
 
     def get_container_depth(self, cntr: Container) -> int:
         """Inputs container. Returns number of containers above current container."""
-        i, j = cntr.ship_coord[5, 1][1, 2]
-        i -= 1  # start check at cell above current container
-        count = 0
-        while i >= 0 and self.ship_state[i][j] != "UNUSED":
-            count += 1
-            i -= 1
-        return count
+        i, j = cntr.ship_coord
+        return i - self.top_columns[j] - 1
+        # i, j = cntr.ship_coord[5, 1][1, 2]
+        # i -= 1  # start check at cell above current container
+        # count = 0
+        # while i >= 0 and self.ship_state[i][j] != "UNUSED":
+        #     count += 1
+        #     i -= 1
+        # return count
 
     """Takes in a Container and finds the container that is best to unload (given it was not marked)"""
     # TODO: Find a way to mark containers that are already considered
