@@ -51,7 +51,7 @@ def create_ship(
 
     ship1 = Ship()
     ship1.init_ship_state_manifest(manifest_cntnt)
-    ship1.init_goal_state(loads, unloads)
+    # ship1.init_goal_state(loads, unloads)
 
     # cntr_names = []
     # with open("ShipState1.txt") as f:
@@ -59,9 +59,9 @@ def create_ship(
 
     # ship2 = Ship(cntr_names=cntr_names)
 
-    print(ship1)
-    # print(ship2)
-    ship1.print_weights()
+    # print(ship1)
+
+    # ship1.print_weights()
     # print(ship1.is_balanced())
     # print(get_moves(ship1, [7, 2], [7, 4]))
     # outbound_contents = ship1.get_outbound_manifest()

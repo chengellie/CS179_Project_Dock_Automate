@@ -1,3 +1,4 @@
+import copy
 from container import Container
 from typing import List, Optional
 
@@ -113,21 +114,26 @@ class Ship:
         return ret
 
     def print_weights(self) -> None:
-        """Inputs None, prints container weights in grid format. Returns None."""
+        """Inputs None, prints container weights in grid format using -1 for NAN containers. Returns None."""
         ret = ""
         for row in self.ship_state:
             for cntr in row:
-                shortened = str(cntr.weight)[:6].ljust(6)
+                if cntr.name != "NAN":
+                    str_weight = str(cntr.weight)[:6]
+                else:
+                    str_weight = "NAN"
+                shortened = str_weight.ljust(6)
                 ret += shortened + " "
             ret += "\n"
         print(ret)
 
-    def ship_str(self) -> str:
-        """Inputs None, Returns ship_state as a string."""
+    def generate_ship_key(self) -> str:
+        """Inputs None, Returns unique identifier for ship as a string."""
         ret = ""
         for row in self.ship_state:
             for cntr in row:
-                ret += cntr
+                ret += cntr.name
+        ret += str(self.crane_loc) + str(self.move_crane)
         return ret
 
     def is_balanced(self) -> bool:
@@ -175,9 +181,52 @@ class Ship:
             i -= 1
         return count
 
-    def is_empty_col(self, col: int):
-        """Inputs column number. Returns whether column has any containers."""
-        return self.ship_state[self.row - 1][col] == "UNUSED"
+    def get_col_top_cntr_depth(self, col: int) -> int:
+        """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
+        i = 0
+        while i < self.row and self.ship_state[i][col].name == "UNUSED":
+            i += 1
+
+        if i >= self.row or self.ship_state[i][col].name == "NAN":
+            return -1
+        else:
+            return i
+
+    def get_col_top_empty_depth(self, col: int) -> int:
+        """Inputs column. Returns row index of last empty slot in ship_state or -1 if col is full."""
+        i = self.row - 1
+        while i >= 0 and (self.ship_state[i][col].name != "UNUSED"):
+            i -= 1
+
+        if i < 0:
+            return -1
+        else:
+            return i
+
+    def is_full_col(self, col: int) -> bool:
+        """Inputs column number. Returns whether column is full."""
+        return self.ship_state[0][col].name != "UNUSED"
+
+    # todo: deal with nan for empty cols and computation
+    def is_empty_col(self, col: int) -> bool:
+        """Inputs column number. Returns whether column is empty."""
+        if self.ship_state[self.row - 1][col].name == "UNUSED":
+            return True
+
+        i = self.row - 1
+        # print(i, col, self)
+        while i >= 0 and self.ship_state[i][col].name != "UNUSED":
+            i -= 1
+
+        if i < 0:  # entire col is filled, either containers or NAN
+            return False
+        elif i >= 0 and self.ship_state[i + 1][col].name == "NAN":
+            return True
+        elif i >= 0 and self.ship_state[i + 1][col].name != "NAN":
+            return False
+        else:
+            print("Error: uncaught condition for empty column")
+            return False
 
     def get_ship_columns(self, indx: int = -1):
         """Gets list of all containers of all or a single column. Returns None."""
@@ -193,17 +242,75 @@ class Ship:
 
         return columns
 
-    def copy_ship(self):
-        return self.deep_copy()
+    def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
+        temp = self.ship_state[pos1[0]][pos1[1]]
+        self.ship_state[pos1[0]][pos1[1]] = self.ship_state[pos2[0]][pos2[1]]
+        self.ship_state[pos2[0]][pos2[1]] = temp
+        temp = self.ship_state[pos1[0]][pos1[1]].get_manifest_coord()
+        self.ship_state[pos1[0]][pos1[1]].set_manifest_coord(
+            self.ship_state[pos2[0]][pos2[1]].get_manifest_coord()
+        )
+        self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
+
+    def move_cntr(self, col_get: int, col_put: int) -> None:
+        """Inputs column to get container from and move container to. Returns None."""
+        row_get = self.get_col_top_cntr_depth(col_get)
+        if row_get == -1:
+            print("Error: No container to get in column", col_get)
+            return
+
+        row_put = self.get_col_top_empty_depth(col_put)
+        if row_put == -1:
+            print("Error: Cannot put container in this column, column is full.")
+            return
+
+        self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
+        # self.ship_state[row_put][col_put] = self.ship_state[row_get][col_get]
+        # new_cntr = self.ship_state[row_put][col_put]
+        # new_cntr.set_manifest_coord([row_put, col_put])
+
+        # old_cntr = self.ship_state[row_get][col_get]
+        # old_cntr.name = "UNUSED"
+        # old_cntr.weight = 0
+        # print(self)
 
     def move_crane(self, col: int):
         """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
-        else:
+        elif self.crane_mode == "put" or self.crane_mode == None:
             new_crane_mode = "get"
+            self.crane_loc = -1
+        else:
+            print("Error: current crane_mode is not a valid option")
 
-        new_ship = Ship(self.ship_state)
-        new_ship = copy_ship()
+        # check if crane is getting container from empty col
+        if new_crane_mode == "get" and self.is_empty_col(col):
+            # print("get empty", col)
+            return None
+
+        # check if crane is getting container from col of NAN
+        if new_crane_mode == "get" and self.ship_state[0][col].name == "NAN":
+            # print("get NAN", col)
+            return None
+
+        # check if crane is putting container to full col, including col of NAN
+        if new_crane_mode == "put" and self.is_full_col(col):
+            # print("put full", col)
+            return None
+
+        # check crane_loc is not being moved to same col
+        if col == self.crane_loc:
+            # print("same col", col)
+            return None
+
+        new_ship = copy.deepcopy(self)
         new_ship.crane_loc = col
+        new_ship.crane_mode = new_crane_mode
+
+        # perform move if new_crane_mode is put
+        if new_crane_mode == "put":
+            get_col = self.crane_loc
+            new_ship.move_cntr(get_col, col)
+
         return new_ship

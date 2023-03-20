@@ -9,27 +9,36 @@ from queue import Queue
 def balance_queueing(nodes: Queue, node: Ship, dups: Set[str], row: int, col: int):
     children = []
 
-    for i in col:
-        if i != node.crane_loc:  # check crane_loc is not in same col
-            children.append(node.move_crane(i))
+    for i in range(col):
+        children.append(node.move_crane(i))
+        # print("new child", children[len(children) - 1])
 
     for child in children:
-        if child != None and child.ship_str() not in dups:
-            nodes.push(child)
-            dups.add(child.ship_str())
+        # print("child", child == None, end=" ")
+        # if child == None:
+        #     print()
+        # else:
+        #     print(child.crane_loc, child.crane_mode, "\n", child)
+        if child != None and child.generate_ship_key() not in dups:
+            nodes.put(child)
+            # print(child.crane_loc, child.crane_mode)
+            dups.add(child.generate_ship_key())
+
+    # print("Dups:", len(dups))
 
 
 def uniform_cost_balance(problem: Ship) -> Optional[Ship]:
     nodes = Queue()
     nodes.put(problem)
     dups = set()
-    dups.add(problem.ship_str())  # use ship_str as hash key
+    dups.add(problem.generate_ship_key())
     max_queue = 1
     expanded_nodes = 0
 
     while not nodes.empty():
         node = nodes.get()
         expanded_nodes += 1
+        # print(node, node.crane_loc)
 
         if node.is_balanced():
             print(node)
