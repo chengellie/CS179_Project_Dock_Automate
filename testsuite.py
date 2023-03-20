@@ -110,7 +110,7 @@ print(a.top_columns)
 print(a.cntrs_in_row[6])
 
 # Remove a container
-for i in range(0, 3):
+for i in range(0, 4):
     print(a.cntrs_in_row[5-1])
     rm_cntr = a.remove_cntr(4)
 
