@@ -2,31 +2,38 @@
 {% block title %} Selection {% endblock %}
 {% block content %}
 
-<form class="w3-container w3-center" method="post">
-    <!-- <br>
-    <label class="w3-text-blue-grey"><b>Item to Unload</b></label>
-    <input class="w3-input w3-border" type="text">
-     
-    <label class="w3-text-blue-grey"><b>Item Count</b></label>
-    <input class="w3-input w3-border" type="number">
-    <br>
-    <button class="w3-btn w3-blue-grey">Submit Item</button>
-    <br> -->
-    <br>
-    {% for i in range(8) %}
-        <div>
-            {% for j in range(12)%}
-            <input type="checkbox" name="unload" value="{{content[i][j]}}_{{i}}_{{j}}">
-            {% endfor %}   
-        </div>
-    {% endfor %}
-    
-    <br>
-    <button class="w3-btn w3-blue-grey">Submit Selection</button>
-    <br> 
-
-</form>
 <br>
+<div class="w3-col w3-card-4">
+    
+    <form class="w3-container w3-center" method="post">
+        <br>
+        <h2>Unload Container</h2>
+        <!-- <br>
+            <label class="w3-text-blue-grey"><b>Item to Unload</b></label>
+            <input class="w3-input w3-border" type="text">
+            
+            <label class="w3-text-blue-grey"><b>Item Count</b></label>
+            <input class="w3-input w3-border" type="number">
+            <br>
+            <button class="w3-btn w3-blue-grey">Submit Item</button>
+            <br> -->
+            <br>
+            {% for i in range(8) %}
+            <div>
+                {% for j in range(12)%}
+                <input type="checkbox" name="unload" value="{{content[i][j]}}_{{i}}_{{j}}">
+                {% endfor %}   
+            </div>
+            {% endfor %}
+            
+            <br>
+            <button class="w3-btn w3-blue-grey">Submit Selection</button>
+            <br> 
+            
+        </form>
+        <br>
+</div>
+        <br>
 <div class="w3-container">
     <div class="w3-center">
         <h2>Container Action List</h2>
