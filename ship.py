@@ -2,6 +2,24 @@ import copy
 from container import Container
 from typing import List, Optional
 
+# modify or remove get columns, unneeded. instead have search and find depth go rowwise instead. (search algo will mark matching containers. list stores them in depth order (will shift accordingly)
+
+"""
+# get count of all containers in a row from top to bottom and depth to the top of that column
+        self.top_columns = [-1] * self.col
+        for i, row in enumerate(self.ship_state):
+            cntr_row = {}
+            for j, cntr in enumerate(row):
+                if cntr.name not in cntr_row:
+                    cntr_row[cntr.name] = []
+                    # cntr_row[cntr.name] = 0
+                cntr_row[cntr.name].append([i, j])
+                # cntr_row[cntr.name] += 1
+                if cntr.name == "UNUSED":
+                    self.top_columns[j] += 1
+            self.cntrs_in_row.append(cntr_row)
+"""
+
 
 class Ship:
     def __init__(self, ship_state: Optional[List[Container]] = []) -> None:
@@ -12,27 +30,6 @@ class Ship:
         self.crane_loc = -1
         self.crane_mode = None
         self.moves = []
-
-    # def __init__(
-    #     self,
-    #     ship_state: Optional[List[]] = [],
-    #     manifest: Optional[List[str]] = None,
-    #     loads: Optional[list] = [],
-    #     unloads: Optional[list] = [],
-    #     cntr_names: Optional[List[List[str]]] = None,
-    #     crane_mode: str = "get",
-    # ) -> None:
-    #     self.ship_state = []
-    #     self.goal_state = {}
-    #     self.row = 8
-    #     self.col = 12
-    #     self.crane_loc = -1
-    #     self.crane_mode = crane_mode
-    #     if manifest != None and cntr_names == None:
-    #         self.__init_ship_state_manifest(manifest)
-    #     elif manifest == None and cntr_names != None:
-    #         self.__init_ship_state_names(cntr_names)
-    #     self.__init_goal_state(loads, unloads)
 
     def init_ship_state_manifest(self, manifest: List[str]) -> None:
         """Input manifest, constructs container objects and fills ship with containers. Returns None."""
@@ -50,17 +47,10 @@ class Ship:
         # fill in 2d list for ship_state with containers
         k = 0
         for i in range(self.row - 1, -1, -1):
+            cntr_row = {}
             for j in range(self.col):
                 self.ship_state[i][j] = containers[k]
                 k += 1
-
-    # def __init_ship_state_names(self, cntr_names: List[List[str]]) -> None:
-    #     """Input 2d list of container names, constructs container objects and fills ship with containers. Returns None."""
-    #     self.ship_state = [[None for j in range(self.col)] for i in range(self.row)]
-    #     for i in range(self.row):
-    #         for j in range(self.col):
-    #             c = Container([-1, -1], -1, cntr_names[i][j], [self.row, self.col])
-    #             self.ship_state[i][j] = c
 
     def init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
         """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
@@ -181,6 +171,51 @@ class Ship:
             i -= 1
         return count
 
+    """Takes in a Container and finds the container that is best to unload (given it was not marked)"""
+    # TODO: Find a way to mark containers that are already considered
+    def find_best_cntr(self, unload_cntr:Container) -> Container:
+        cntr_name = unload_cntr.name
+        orig_cntr_coord = unload_cntr.ship_coord
+        curr_cntr_coord = orig_cntr_coord
+        curr_cntr_depth = orig_cntr_coord[0] - self.top_columns[orig_cntr_coord[1]]
+
+        # compute depth and choose this container if smaller depth (preferably choose one in higher point)
+        for i, row in enumerate(self.cntrs_in_row):
+            if cntr_name in row and orig_cntr_coord not in row[cntr_name]:   # container exists in this row and isn't the original (we can skip)
+                for pot_cntr in row[cntr_name]:
+                    if i - self.top_columns[pot_cntr[1]] < curr_cntr_depth:
+                        unload_cntr = self.ship_state[i][pot_cntr[1]]
+
+        return unload_cntr
+
+    def add_cntr(self, cntr:Container, col:int) -> None:
+        row = self.top_columns[col]
+        cntr.ship_coord = [row, col]
+        
+        # TODO: Check if full
+        # Mark container coord as used
+        self.ship_state[row][col] = cntr
+        self.top_columns[col] -= 1
+        self.cntrs_in_row[row]["UNUSED"].remove([row,col])
+        self.cntrs_in_row[row][cntr.name].append([row, col])
+    
+    def remove_cntr(self, col:int) -> Container:
+        # TODO: Check if empty
+
+        # Get container being removed
+        self.top_columns[col] += 1
+        row = self.top_columns[col]
+        removed_cntr = self.ship_state[row][col]
+
+        # Mark top coord of column unused
+        self.ship_state[row][col] = Container([row, col], 0, "UNUSED", [self.row, self.col])
+        self.cntrs_in_row[row]["UNUSED"].append([row,col])
+        self.cntrs_in_row[row][removed_cntr.name].remove([row, col])
+
+        return removed_cntr
+
+        
+
     def get_col_top_cntr_depth(self, col: int) -> int:
         """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
         i = 0
@@ -209,7 +244,7 @@ class Ship:
 
     # todo: deal with nan for empty cols and computation
     def is_empty_col(self, col: int) -> bool:
-        """Inputs column number. Returns whether column is empty."""
+        """Inputs column number. Returns whe ther column is empty."""
         if self.ship_state[self.row - 1][col].name == "UNUSED":
             return True
 

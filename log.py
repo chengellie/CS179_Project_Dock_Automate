@@ -1,8 +1,10 @@
 import datetime
 import os
+import shutil
 import re
 from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR
 # https://www.tutorialspoint.com/How-to-change-the-permission-of-a-file-using-Python
+# TODO: Create a retrievable copy. Change visibility of directory
 
 """
 Log class for logging. Will find a log file in designated space and open that. If multiple, choose one with largest year.
