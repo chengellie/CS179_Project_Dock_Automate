@@ -179,6 +179,7 @@ class Ship:
 
     """Takes in a Container and finds the container that is best to unload (given it was not marked)"""
     # TODO: Find a way to mark containers that are already considered
+    # TODO: If remove coords in container, just take in a size 2 list instead and do a trycatch
     def find_best_cntr(self, unload_cntr:Container) -> Container:
         cntr_name = unload_cntr.name
         orig_cntr_coord = unload_cntr.ship_coord
@@ -196,9 +197,11 @@ class Ship:
 
     def add_cntr(self, cntr:Container, col:int) -> None:
         row = self.top_columns[col]
+        if row <= -1:
+            print("Full")
+            return
         cntr.ship_coord = [row, col]
         
-        # TODO: Check if full
         # Mark container coord as used
         self.ship_state[row][col] = cntr
         self.top_columns[col] -= 1
@@ -206,7 +209,9 @@ class Ship:
         self.cntrs_in_row[row][cntr.name].append([row, col])
     
     def remove_cntr(self, col:int) -> Container:
-        # TODO: Check if empty
+        if self.top_columns[col] >= 7:
+            print("Empty")
+            return None
 
         # Get container being removed
         self.top_columns[col] += 1

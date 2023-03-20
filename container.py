@@ -10,6 +10,7 @@ class Container:
         self.ship_size = ship_size
         self.weight = weight
         self.name = name
+        self.selected = False
 
     def __str__(self) -> str:
         """Inputs None. Returns 6-character shortened version of container name."""
