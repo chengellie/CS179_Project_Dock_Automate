@@ -3,6 +3,7 @@ from log import Log
 from datetime import datetime
 from ship import Ship
 import copy
+import shiputil
 
 class TestSuite:
     def __init__(self, manifest, logcase):
@@ -81,19 +82,11 @@ class TestSuite:
 Auxiliary Testing - All Functions
 """
 
-# s = create_ship(
-#         "ShipCase/shipcasetest.txt",
-#         "load_unload.txt",
-#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-#     )
-# columns = s.get_ship_columns(11)
-# print([c.name for c in columns[0]])
-
-s = Ship("ShipCase/shipcasetest.txt")
-# print(s)
-
-# # columns = s.get_ship_columns()
-# print(s)
+s = shiputil.create_ship(
+        "ShipCase/ShipCase4.txt",
+        "load_unload.txt",
+        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    )
 
 a = copy.deepcopy(s)
 # a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
@@ -102,30 +95,24 @@ print(a.top_columns)
 print(a.cntrs_in_row[6])
 
 # Add a container
-test_cntr = a.ship_state[7][1]
+print("============================== Add Cat")
+test_cntr = a.ship_state[6][4]
+print(a.cntrs_in_row[5])
 a.add_cntr(test_cntr, 11)
-
 print(a)
 print(a.top_columns)
 print(a.cntrs_in_row[6])
 
 # Remove a container
+print("============================== Remove 4 Containers From Col 4")
 for i in range(0, 4):
-    print(a.cntrs_in_row[5-1])
-    rm_cntr = a.remove_cntr(4)
+    rm_cntr = a.remove_cntr(11)
 
-    print(a)
-    print(a.top_columns)
-    print(a.cntrs_in_row[5-1])
-    print(rm_cntr)
+    print(f"Removed {rm_cntr}")
 
-s.ship_state[7][3].name = "Cake"
 print(a)
-print(a.goal_state)
-print(s)
-print(s.goal_state)
-
-
+print(a.top_columns)
+print(a.cntrs_in_row[4])
 # test_cntr = a.find_best_cntr(test_cntr)
 # print(test_cntr)
 # print(test_cntr.ship_coord)
