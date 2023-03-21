@@ -2,6 +2,7 @@ from typing import Optional, Set
 from queue import Queue, PriorityQueue
 from ship import Ship
 from shiputil import *
+from util import PrioritizedShip
 from log import Log
 from queue import Queue
 from container import Container
@@ -109,8 +110,18 @@ def priority_balance_queueing(
         # else:
         #     print(child.crane_loc, child.crane_mode, "\n", child)
         if child != None and child.generate_ship_key() not in dups:
-            nodes.put(child)
-            # print(child.crane_loc, child.crane_mode)
+            nodes.put(PrioritizedShip(child.time_cost, child))
+            # print(
+            #     node.crane_loc,
+            #     node.crane_mode,
+            #     node.time_cost,
+            #     child.crane_loc,
+            #     child.crane_mode,
+            #     child.time_cost,
+            #     "\n",
+            #     child.generate_ship_key(),
+            # )
+            # print(child)
             dups.add(child.generate_ship_key())
 
     # print("Dups:", len(dups))
@@ -118,14 +129,14 @@ def priority_balance_queueing(
 
 def uniform_cost_balance(problem: Ship) -> Optional[Ship]:
     nodes = PriorityQueue()
-    nodes.put((problem.time_cost, problem))
+    nodes.put(PrioritizedShip(problem.time_cost, problem))
     dups = set()
     dups.add(problem.generate_ship_key())
     max_queue = 1
     expanded_nodes = 0
 
     while not nodes.empty():
-        node = nodes.get()
+        node = nodes.get().item
         expanded_nodes += 1
         # print(node, node.crane_loc)
 

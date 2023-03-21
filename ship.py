@@ -12,7 +12,7 @@ class Ship:
         self.row = 8
         self.col = 12
         self.crane_loc = -1
-        self.crane_mode = None
+        self.crane_mode = "put"
         self.time_cost = 0
         self.moves = []
         self.cntrs_in_row = []
@@ -123,7 +123,9 @@ class Ship:
         for row in self.ship_state:
             for cntr in row:
                 ret += cntr.name
-        ret += str(self.crane_loc) + str(self.move_crane)
+        # if self.crane_mode == "get":
+        ret += str(self.crane_loc)
+        # ret += str(self.crane_mode)
         return ret
 
     def is_balanced(self) -> bool:
@@ -169,7 +171,7 @@ class Ship:
     """Takes in a Container and finds the container that is best to unload (given it was not marked)"""
     # TODO: Find a way to mark containers that are already considered
     # TODO: If remove coords in container, just take in a size 2 list instead and do a trycatch
-    def find_best_cntr(self, unload_cntr:Container) -> Container:
+    def find_best_cntr(self, unload_cntr: Container) -> Container:
         cntr_name = unload_cntr.name
         orig_cntr_coord = unload_cntr.ship_coord
         curr_cntr_coord = orig_cntr_coord
@@ -177,7 +179,9 @@ class Ship:
 
         # compute depth and choose this container if smaller depth (preferably choose one in higher point)
         for i, row in enumerate(self.cntrs_in_row):
-            if cntr_name in row and orig_cntr_coord not in row[cntr_name]:   # container exists in this row and isn't the original (we can skip)
+            if (
+                cntr_name in row and orig_cntr_coord not in row[cntr_name]
+            ):  # container exists in this row and isn't the original (we can skip)
                 for pot_cntr_coord in row[cntr_name]:
                     if i - self.top_columns[pot_cntr_coord[1]] < curr_cntr_depth:
                         pot_cntr = self.get_cntr(pot_cntr_coord)
@@ -191,38 +195,40 @@ class Ship:
     def get_cntr(self, coords):
         return self.ship_state[coords[0]][coords[1]]
 
-    def add_cntr(self, cntr:Container, col:int) -> None:
+    def add_cntr(self, cntr: Container, col: int) -> None:
         row = self.top_columns[col]
         if row <= -1:
             print("Full")
             return
         cntr.ship_coord = [row, col]
-        
+
         # Mark container coord as used
         self.ship_state[row][col] = cntr
         self.top_columns[col] -= 1
-        self.cntrs_in_row[row]["UNUSED"].remove([row,col])
-        
+        self.cntrs_in_row[row]["UNUSED"].remove([row, col])
+
         # Add container to row list
         if cntr.name not in self.cntrs_in_row[row]:
             self.cntrs_in_row[row][cntr.name] = []
         self.cntrs_in_row[row][cntr.name].append([row, col])
-    
-    def remove_cntr(self, col:int) -> Container:
-        row = self.top_columns[col]+1
+
+    def remove_cntr(self, col: int) -> Container:
+        row = self.top_columns[col] + 1
 
         if self.top_columns[col] >= 7 or self.ship_state[row][col].name == "NAN":
             print("Empty")
-            return None 
+            return None
 
         # Get container being removed
         removed_cntr = self.ship_state[row][col]
 
         # Mark top coord of column unused
-        self.ship_state[row][col] = Container([row, col], 0, "UNUSED", [self.row, self.col])
+        self.ship_state[row][col] = Container(
+            [row, col], 0, "UNUSED", [self.row, self.col]
+        )
         if "UNUSED" not in self.cntrs_in_row[row]:
             self.cntrs_in_row[row]["UNUSED"] = []
-        self.cntrs_in_row[row]["UNUSED"].append([row,col])
+        self.cntrs_in_row[row]["UNUSED"].append([row, col])
 
         # Remove container from row list and update top columns
         self.cntrs_in_row[row][removed_cntr.name].remove([row, col])
@@ -301,8 +307,49 @@ class Ship:
         )
         self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
 
+    def get_moves(self, start_pos, end_pos):
+        """Input start and end pos. Returns list of coordinates to move container from start to end."""
+        coord = []
+
+        # find higest row container needs to move to, first empty row between start_pos and end_pos
+        if start_pos[1] < end_pos[1]:
+            left = start_pos
+            right = end_pos
+            inc = 1
+        else:
+            left = end_pos
+            right = start_pos
+            inc = -1
+        max_height = left[0]
+        for j in range(left[1] + 1, right[1] + 1):
+            while self.ship_state[max_height][j].name != "UNUSED":
+                max_height -= 1
+
+        # insert moves up
+        for i in range(start_pos[0], max_height - 1, -1):
+            coord.append([i, start_pos[1]])
+
+        # insert horizontal moves
+        if inc == 1:
+            for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
+                coord.append([max_height, j])
+        else:
+            for j in range(start_pos[1] - 1, end_pos[1] - 1, -1):
+                coord.append([max_height, j])
+
+        # insert moves down
+        for i in range(max_height + 1, end_pos[0] + 1, 1):
+            coord.append([i, end_pos[1]])
+
+        return coord
+
     def move_cntr(self, col_get: int, col_put: int) -> None:
         """Inputs column to get container from and move container to. Returns None."""
+        # return if moving container from and to same col
+        if col_get == col_put:
+            print("Error: Container is not being moved")
+            return
+
         row_get = self.get_col_top_cntr_depth(col_get)
         if row_get == -1:
             print("Error: No container to get in column", col_get)
@@ -312,16 +359,13 @@ class Ship:
         if row_put == -1:
             print("Error: Cannot put container in this column, column is full.")
             return
-
+        # update cost and moves
+        self.time_cost += (
+            len(self.get_moves([row_put, col_put], [row_get, col_get])) - 1
+        )
         self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
-        # self.ship_state[row_put][col_put] = self.ship_state[row_get][col_get]
-        # new_cntr = self.ship_state[row_put][col_put]
-        # new_cntr.set_manifest_coord([row_put, col_put])
-
-        # old_cntr = self.ship_state[row_get][col_get]
-        # old_cntr.name = "UNUSED"
-        # old_cntr.weight = 0
-        # print(self)
+        self.moves.append([row_get, col_get])
+        self.moves.append([row_put, col_put])
 
     def move_crane(self, col: int):
         """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
@@ -329,7 +373,7 @@ class Ship:
             new_crane_mode = "put"
         elif self.crane_mode == "put" or self.crane_mode == None:
             new_crane_mode = "get"
-            self.crane_loc = -1
+            # self.crane_loc = -1
         else:
             print("Error: current crane_mode is not a valid option")
 
@@ -349,7 +393,7 @@ class Ship:
             return None
 
         # check crane_loc is not being moved to same col
-        if col == self.crane_loc:
+        if new_crane_mode == "put" and col == self.crane_loc:
             # print("same col", col)
             return None
 
