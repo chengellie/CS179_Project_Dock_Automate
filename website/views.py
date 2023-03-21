@@ -15,16 +15,21 @@ loading = Blueprint("loading", __name__)
 current_user = ''
 current_ship = ''
 
-def create_ship(manifest_filename, op_filename):
-    """Input filename of manifest, parses file contents. Returns ship object."""
-    # https://www.pythontutorial.net/python-basics/python-read-text-file/
-    with open(manifest_filename) as f:
-        manifest_cntnt = [line for line in f.readlines()]
-    with open(op_filename) as f:
-        loads = f.readline().strip().split(",")
-        unloads = f.readline().strip().split(",")
-    ret = Ship(manifest_cntnt, loads, unloads)
-    return ret
+
+# def create_ship(manifest_filename, op_filename):
+#     """Input filename of manifest, parses file contents. Returns ship object."""
+#     # https://www.pythontutorial.net/python-basics/python-read-text-file/
+#     with open(manifest_filename) as f:
+#         manifest_cntnt = [line for line in f.readlines()]
+#     with open(op_filename) as f:
+#         loads = f.readline().strip().split(",")
+#         unloads = f.readline().strip().split(",")
+#     ret = create_ship(
+#         "ShipCase/ShipCase4.txt",
+#         "load_unload.txt",
+#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+#     )
+#     return ret
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
@@ -46,14 +51,19 @@ def selection1():
 @unloading.route("/", methods = ['GET','POST'])
 def unload():
     global current_user
-    ship = create_ship("ShipCase/ShipCase1.txt", "load_unload.txt")
+    ship = create_ship(
+        "ShipCase/ShipCase4.txt",
+        "load_unload.txt",
+        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    )
     item = ship.ship_state
     if request.method == 'POST':
         unload = request.form.getlist('unload')
         with open('data/action_list.csv', mode = 'a') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in unload:
-                file_writer.writerow([i,1,'Unload'])
+                name,position = i.split('   _')
+                file_writer.writerow([name,1,'Unload',position])
 
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
@@ -71,7 +81,7 @@ def load():
         load_count = request.form.get('item_count')
         with open('data/action_list.csv', mode = 'a') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            file_writer.writerow([load_name,load_count,'Load'])
+            file_writer.writerow([load_name,load_count,'Load','N/A'])
             
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
@@ -82,7 +92,11 @@ def load():
 @tables.route("/")
 def table():
     global current_user
-    ship = create_ship("ShipCase/ShipCase1.txt", "load_unload.txt")
+    ship = create_ship(
+        "ShipCase/ShipCase4.txt",
+        "load_unload.txt",
+        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    )
     item = ship.ship_state
     row = len(item)
     col = len(item[0])

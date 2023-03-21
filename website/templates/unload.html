@@ -21,7 +21,7 @@
             {% for i in range(8) %}
             <div>
                 {% for j in range(12)%}
-                <input type="checkbox" name="unload" value="{{content[i][j]}}_{{i}}_{{j}}">
+                <input type="checkbox" name="unload" value="{{content[i][j]}}_{{8-i}}_{{j+1}}">
                 {% endfor %}   
             </div>
             {% endfor %}
