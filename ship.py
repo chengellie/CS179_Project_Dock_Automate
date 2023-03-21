@@ -13,6 +13,7 @@ class Ship:
         self.col = 12
         self.crane_loc = -1
         self.crane_mode = None
+        self.time_cost = 0
         self.moves = []
         self.cntrs_in_row = []
 
