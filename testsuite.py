@@ -4,6 +4,10 @@ from datetime import datetime
 from ship import Ship
 import copy
 import shiputil
+import search
+from container import Container
+
+# TODO: Output to a testlog_id
 
 class TestSuite:
     def __init__(self, manifest, logcase):
@@ -114,22 +118,14 @@ print(a)
 print(a.top_columns)
 print(a.cntrs_in_row[4])
 print(a.get_container_depth(test_cntr))
-# test_cntr = a.find_best_cntr(test_cntr)
-# print(test_cntr)
-# print(test_cntr.ship_coord)
-# print(s.ship_state[7][1].ship_coord)
-# print(a.goal_state)
-# Log("")
 
-# t = TestSuite("OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt", "LogCase/LogCase1.txt")
-
-# leftWeight = 0
-# rightWeight = 0
-# for col in zip(columns[:len(columns)//2], columns[len(columns)//2:]):
-#     leftWeight += sum([c.weight for c in col[0]])
-#     rightWeight += sum([c.weight for c in col[1]])
-# print(leftWeight, rightWeight)
-
+# Find Best Container
+print("============================== Finding Best Containers")
+unloads = [[6, 4], [4,4]]
+loads = [Container([-1, -1], i, f"Test {i}", [a.row, a.col]) for i in range(0, 4)]
+# search.load_unload(a, unloads=unloads)
+for cntr in unloads:
+    print(cntr.ship_coord)
 """
 Test Suite 0.1 - shipcasetest.txt
 Offload: [Cat]

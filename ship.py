@@ -164,13 +164,6 @@ class Ship:
         """Inputs container. Returns number of containers above current container."""
         i, j = cntr.ship_coord
         return i - self.top_columns[j] - 1
-        # i, j = cntr.ship_coord[5, 1][1, 2]
-        # i -= 1  # start check at cell above current container
-        # count = 0
-        # while i >= 0 and self.ship_state[i][j] != "UNUSED":
-        #     count += 1
-        #     i -= 1
-        # return count
 
     """Takes in a Container and finds the container that is best to unload (given it was not marked)"""
     # TODO: Find a way to mark containers that are already considered
@@ -184,11 +177,18 @@ class Ship:
         # compute depth and choose this container if smaller depth (preferably choose one in higher point)
         for i, row in enumerate(self.cntrs_in_row):
             if cntr_name in row and orig_cntr_coord not in row[cntr_name]:   # container exists in this row and isn't the original (we can skip)
-                for pot_cntr in row[cntr_name]:
-                    if i - self.top_columns[pot_cntr[1]] < curr_cntr_depth:
-                        unload_cntr = self.ship_state[i][pot_cntr[1]]
+                for pot_cntr_coord in row[cntr_name]:
+                    if i - self.top_columns[pot_cntr_coord[1]] < curr_cntr_depth:
+                        pot_cntr = self.get_cntr(pot_cntr_coord)
+                        if not pot_cntr.selected:
+                            unload_cntr.selected = False
+                            unload_cntr = pot_cntr
+                            unload_cntr.selected = True
 
         return unload_cntr
+
+    def get_cntr(self, coords):
+        return self.ship_state[coords[0]][coords[1]]
 
     def add_cntr(self, cntr:Container, col:int) -> None:
         row = self.top_columns[col]
