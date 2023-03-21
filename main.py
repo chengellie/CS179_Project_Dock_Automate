@@ -1,6 +1,8 @@
 import csv
 import copy
 from typing import Optional, Set
+from time import time  # https://docs.python.org/3/library/time.html
+
 from ship import Ship
 from search import *
 from shiputil import *
@@ -9,7 +11,7 @@ from log import Log
 
 if __name__ == "__main__":
     ship = create_ship(
-        "ShipCase/ShipCase2.txt",
+        "ShipCase/ShipCase3.txt",
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )
@@ -18,8 +20,10 @@ if __name__ == "__main__":
     # sol = breadth_first_balance(ship)
     # print(sol.moves)
     # sol.print_weights()
-
+    start_time = time()
     sol = uniform_cost_balance(ship)
+    print(f"Timer: {round(time() - start_time, 5)} seconds")
+
     if sol != None:
         print(sol.moves)
 
