@@ -59,10 +59,11 @@ def unload():
     item = ship.ship_state
     if request.method == 'POST':
         unload = request.form.getlist('unload')
-        with open('data/action_list.csv', mode = 'a') as csvfile:
+        with open('data/action_list.csv', mode = 'a',newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in unload:
-                name,position = i.split('   _')
+                print(i)
+                name,position = i.split('__')
                 file_writer.writerow([name,1,'Unload',position])
 
     csvfile = open('data/action_list.csv')
@@ -79,7 +80,7 @@ def load():
         load_name = request.form.get('item_name')
         load_weight = request.form.get('item_weight')
         load_count = request.form.get('item_count')
-        with open('data/action_list.csv', mode = 'a') as csvfile:
+        with open('data/action_list.csv', mode = 'a', newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow([load_name,load_count,'Load','N/A'])
             
