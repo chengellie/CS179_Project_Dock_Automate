@@ -173,22 +173,24 @@ class Ship:
     # TODO: If remove coords in container, just take in a size 2 list instead and do a trycatch
     def find_best_cntr(self, unload_cntr: Container) -> Container:
         cntr_name = unload_cntr.name
-        orig_cntr_coord = unload_cntr.ship_coord
-        curr_cntr_coord = orig_cntr_coord
-        curr_cntr_depth = orig_cntr_coord[0] - self.top_columns[orig_cntr_coord[1]]
+        orig_cntr = unload_cntr
+        curr_cntr = unload_cntr
 
         # compute depth and choose this container if smaller depth (preferably choose one in higher point)
         for i, row in enumerate(self.cntrs_in_row):
             if (
-                cntr_name in row and orig_cntr_coord not in row[cntr_name]
+                cntr_name in row and orig_cntr.name not in row[cntr_name]
             ):  # container exists in this row and isn't the original (we can skip)
                 for pot_cntr_coord in row[cntr_name]:
-                    if i - self.top_columns[pot_cntr_coord[1]] < curr_cntr_depth:
-                        pot_cntr = self.get_cntr(pot_cntr_coord)
-                        if not pot_cntr.selected:
+                    pot_cntr = self.get_cntr(pot_cntr_coord)
+                    pot_cntr_depth = self.get_container_depth(curr_cntr)
+                    curr_cntr_depth = self.get_container_depth(curr_cntr)
+                    if not pot_cntr.selected:
+                        if (pot_cntr_depth < curr_cntr_depth) or (pot_cntr_depth == curr_cntr_depth and pot_cntr_coord[0] < curr_cntr.ship_coord[0]):   # same depth, which one is higher? (Less crane movement time)
                             unload_cntr.selected = False
                             unload_cntr = pot_cntr
                             unload_cntr.selected = True
+                            curr_cntr = unload_cntr
 
         return unload_cntr
 
@@ -200,7 +202,8 @@ class Ship:
         if row <= -1:
             print("Full")
             return
-        cntr.ship_coord = [row, col]
+        cntr.set_ship_coord([row, col])
+        # cntr.ship_coord = [row, col]
 
         # Mark container coord as used
         self.ship_state[row][col] = cntr
@@ -224,8 +227,10 @@ class Ship:
 
         # Mark top coord of column unused
         self.ship_state[row][col] = Container(
-            [row, col], 0, "UNUSED", [self.row, self.col]
+            [-1, -1], 0, "UNUSED", [self.row, self.col]
         )
+        self.ship_state[row][col].set_ship_coord([row, col])
+
         if "UNUSED" not in self.cntrs_in_row[row]:
             self.cntrs_in_row[row]["UNUSED"] = []
         self.cntrs_in_row[row]["UNUSED"].append([row, col])

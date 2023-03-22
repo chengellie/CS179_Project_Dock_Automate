@@ -6,6 +6,7 @@ import copy
 import shiputil
 import search
 from container import Container
+from random import choices
 
 # TODO: Output to a testlog_id
 
@@ -82,50 +83,60 @@ class TestSuite:
 # t = TestSuite("shipcasetest.txt", "LogCase1.txt")
 # t.test(3, "load_unload.txt")
 
+print(
 """
-Auxiliary Testing - All Functions
+#######################################
+Auxiliary Testing - All Functionalities
+#######################################
 """
-
-s = shiputil.create_ship(
-        "ShipCase/ShipCase4.txt",
+)
+# Loading a Manifest to Build Ship From Scratch and Adding Containers
+print("============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers")
+scratch_ship = shiputil.create_ship(
+        "ShipCase/emptyship.txt",
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
+scratch_ship.add_cntr(Container([-1,-1], 75, "Dog", [scratch_ship.row, scratch_ship.col]), 0)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
+scratch_ship.add_cntr(Container([-1,-1], 25, "Rat", [scratch_ship.row, scratch_ship.col]), 0)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 3)
+scratch_ship.add_cntr(Container([-1,-1], 75, "Dog", [scratch_ship.row, scratch_ship.col]), 4)
+scratch_ship.add_cntr(Container([-1,-1], 100, "Emu", [scratch_ship.row, scratch_ship.col]), 3)
+scratch_ship.add_cntr(Container([-1,-1], 300, "Elephant", [scratch_ship.row, scratch_ship.col]), 3)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 5)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 5)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 5)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 5)
+scratch_ship.add_cntr(Container([-1,-1], 30, "Bird", [scratch_ship.row, scratch_ship.col]), 5)
 
-a = copy.deepcopy(s)
-# a = Ship(s.ship_state, ["Bird"], ['Cat', 'Cat'])
-print(a)
-print(a.top_columns)
-print(a.cntrs_in_row[6])
-
-# Add a container
-print("============================== Add Cat")
-test_cntr = a.ship_state[6][4]
-print(a.cntrs_in_row[5])
-a.add_cntr(copy.deepcopy(test_cntr), 11)
-print(a)
-print(a.top_columns)
-print(a.cntrs_in_row[6])
+print(scratch_ship)
 
 # Remove a container
 print("============================== Remove 4 Containers From Col 4")
 for i in range(0, 4):
-    rm_cntr = a.remove_cntr(4)
+    rm_cntr = scratch_ship.remove_cntr(4)
 
     print(f"Removed {rm_cntr}")
 
-print(a)
-print(a.top_columns)
-print(a.cntrs_in_row[4])
-print(a.get_container_depth(test_cntr))
+print(scratch_ship)
+print(scratch_ship.top_columns)
+print(scratch_ship.cntrs_in_row[4])
 
-# Find Best Container
-print("============================== Finding Best Containers")
-unloads = [[6, 4], [4,4]]
-loads = [Container([-1, -1], i, f"Test {i}", [a.row, a.col]) for i in range(0, 4)]
+# Find Best Cat Container
+print("============================== Finding 3 Best Cat Containers")
+test_cntrs = [scratch_ship.get_cntr(cntr_coord) for cntr_coord in [[5, 0], [7, 0], [6, 5]]]
+for cntr in test_cntrs:
+    cntr.selected = True
+    print(scratch_ship.find_best_cntr(cntr).get_cntr_info())
+
+
+# unloads = [[6, 4], [4,4]]
+# loads = [Container([-1, -1], i, f"Test {i}", [scratch_ship.row, scratch_ship.col]) for i in range(0, 4)]
 # search.load_unload(a, unloads=unloads)
-for cntr in unloads:
-    print(cntr.ship_coord)
+# for cntr in unloads:
+#     print(cntr.ship_coord)
 """
 Test Suite 0.1 - shipcasetest.txt
 Offload: [Cat]
@@ -133,6 +144,7 @@ Offload: [Cat]
 Offload: [Dog]
 Onload: [Bird, Bird]
 """
+
 
 """
 Test Suite 0.2 - shipcasetest2.txt
@@ -158,3 +170,8 @@ Offload: [Dog]
 Onload: [Bird, Bird]
 """
 
+# s = shiputil.create_ship(
+#         "ShipCase/ShipCase4.txt",
+#         "load_unload.txt",
+#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+#     )
