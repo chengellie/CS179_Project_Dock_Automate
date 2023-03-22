@@ -180,10 +180,10 @@ class Ship:
         for i, row in enumerate(self.cntrs_in_row):
             if (
                 cntr_name in row and orig_cntr.name not in row[cntr_name]
-            ):  # container exists in this row and isn't the original (we can skip)
+            ):  # container exists in this row and isn't the original
                 for pot_cntr_coord in row[cntr_name]:
                     pot_cntr = self.get_cntr(pot_cntr_coord)
-                    pot_cntr_depth = self.get_container_depth(curr_cntr)
+                    pot_cntr_depth = self.get_container_depth(pot_cntr)
                     curr_cntr_depth = self.get_container_depth(curr_cntr)
                     if not pot_cntr.selected:
                         if (pot_cntr_depth < curr_cntr_depth) or (pot_cntr_depth == curr_cntr_depth and pot_cntr_coord[0] < curr_cntr.ship_coord[0]):   # same depth, which one is higher? (Less crane movement time)
@@ -200,7 +200,7 @@ class Ship:
     def add_cntr(self, cntr: Container, col: int) -> None:
         row = self.top_columns[col]
         if row <= -1:
-            print("Full")
+            print("Add Failed: Full")
             return
         cntr.set_ship_coord([row, col])
         # cntr.ship_coord = [row, col]
@@ -219,7 +219,7 @@ class Ship:
         row = self.top_columns[col] + 1
 
         if self.top_columns[col] >= 7 or self.ship_state[row][col].name == "NAN":
-            print("Empty")
+            print("Remove Failed: Empty")
             return None
 
         # Get container being removed
@@ -241,27 +241,51 @@ class Ship:
 
         return removed_cntr
 
-    def get_col_top_cntr_depth(self, col: int) -> int:
+    def get_col_top_cntr_coord(self, col: int):
         """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
-        i = 0
-        while i < self.row and self.ship_state[i][col].name == "UNUSED":
-            i += 1
+        return [self.get_columns[col] + 1, col]
+        # i = 0
+        # while i < self.row and self.ship_state[i][col].name == "UNUSED":
+        #     i += 1
 
-        if i >= self.row or self.ship_state[i][col].name == "NAN":
-            return -1
-        else:
-            return i
+        # if i >= self.row or self.ship_state[i][col].name == "NAN":
+        #     return -1
+        # else:
+        #     return i
 
-    def get_col_top_empty_depth(self, col: int) -> int:
+    # def get_col_top_cntr(self, col: int) -> int:
+    #     """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
+    #     i = 0
+    #     while i < self.row and self.ship_state[i][col].name == "UNUSED":
+    #         i += 1
+
+    #     if i >= self.row or self.ship_state[i][col].name == "NAN":
+    #         return -1
+    #     else:
+    #         return i
+
+    def get_col_top_empty_coord(self, col: int):
         """Inputs column. Returns row index of last empty slot in ship_state or -1 if col is full."""
-        i = self.row - 1
-        while i >= 0 and (self.ship_state[i][col].name != "UNUSED"):
-            i -= 1
+        return [self.top_columns[col], col]
+        # i = self.row - 1
+        # while i >= 0 and (self.ship_state[i][col].name != "UNUSED"):
+        #     i -= 1
 
-        if i < 0:
-            return -1
-        else:
-            return i
+        # if i < 0:
+        #     return -1
+        # else:
+        #     return i
+
+    # def get_col_top_empty_depth(self, col: int) -> int:
+    #     """Inputs column. Returns row index of last empty slot in ship_state or -1 if col is full."""
+    #     i = self.row - 1
+    #     while i >= 0 and (self.ship_state[i][col].name != "UNUSED"):
+    #         i -= 1
+
+    #     if i < 0:
+    #         return -1
+    #     else:
+    #         return i
 
     def is_full_col(self, col: int) -> bool:
         """Inputs column number. Returns whether column is full."""
@@ -355,12 +379,14 @@ class Ship:
             print("Error: Container is not being moved")
             return
 
-        row_get = self.get_col_top_cntr_depth(col_get)
-        if row_get == -1:
+        # row_get = self.get_col_top_cntr_depth(col_get)
+        row_get = self.top_columns(col_get)
+        if row_get + 1 == self.row:
             print("Error: No container to get in column", col_get)
             return
 
-        row_put = self.get_col_top_empty_depth(col_put)
+        # row_put = self.get_col_top_empty_depth(col_put)
+        row_put = self.top_columns(col_put)
         if row_put == -1:
             print("Error: Cannot put container in this column, column is full.")
             return
