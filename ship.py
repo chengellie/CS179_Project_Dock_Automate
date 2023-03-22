@@ -13,9 +13,18 @@ class Ship:
         self.col = 12
         self.crane_loc = -1
         self.crane_mode = "put"
+        self.balance_mass = -1
         self.time_cost = 0
+        self.cntr_cross_bal_heuristic = 0
+        self.col_move_bal_heuristic = 0
         self.moves = []
         self.cntrs_in_row = []
+
+    def __init_balance_mass(self):
+        """Input None,, computes minimum mass of lighter half for balanced ship. Returns None."""
+        left, right, _, _ = self.get_left_right_mass()
+        self.balance_mass = (0.9 * (left + right)) // 1.9
+        # todo: is it floor or ceiling?
 
     def init_ship_state_manifest(self, manifest: List[str]) -> None:
         """Input manifest, constructs container objects and fills ship with containers. Returns None."""
@@ -51,6 +60,8 @@ class Ship:
                 if cntr.name == "UNUSED":
                     self.top_columns[j] += 1
             self.cntrs_in_row.append(cntr_row)
+
+        self.__init_balance_mass()
 
     def init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
         """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
@@ -128,20 +139,70 @@ class Ship:
         # ret += str(self.crane_mode)
         return ret
 
+    def get_left_right_mass(self) -> int:
+        """Inputs None. Returns mass of the left and right half of the ship."""
+        left = 0
+        right = 0
+        l_weights = []
+        r_weights = []
+        for row in self.ship_state:
+            for j, cntr in enumerate(row):
+                if j >= 0 and j < self.col / 2:
+                    left += cntr.weight
+                    if cntr.weight != 0:
+                        l_weights.append((cntr.weight, j))
+                else:
+                    right += cntr.weight
+                    if cntr.weight != 0:
+                        r_weights.append((cntr.weight, j))
+        return left, right, l_weights, r_weights
+
+    def set_cntr_cross_bal_heuristic(self) -> None:
+        """Inputs None, computes heuristic for balance. Returns None.
+        h(n) = minimum number of containers that need to be moved across mid-line to achieve balanced ship
+        """
+        left, right, l_weights, r_weights = self.get_left_right_mass()
+        deficit = self.balance_mass - min(left, right)
+        weights = l_weights if left > right else r_weights
+        weights.sort(reverse=True)
+        # print(self.balance_mass, weights, deficit)
+
+        cnt = 0
+        for w in weights:
+            if deficit <= 0:
+                break
+            if w[0] <= deficit:
+                cnt += 1
+                deficit -= w[0]
+
+        self.cntr_cross_bal_heuristic = cnt
+
+    # def set_col_move_bal_heuristic(self) -> None:
+    #     """Inputs None, computes heuristic for balance. Returns None.
+    #     h(n) = minimum number of columns to move the minimum number of containers across mid-line to achieve balanced ship
+    #     """
+    #     left, right, l_weights, r_weights = self.get_left_right_mass()
+    #     deficit = self.balance_mass - min(left, right)
+    #     weights = l_weights if left > right else r_weights
+    #     weights.sort(reverse=True)
+    #     # print(self.balance_mass, weights, deficit)
+
+    #     cnt = 0
+    #     for w in weights:
+    #         if deficit <= 0:
+    #             break
+    #         if w <= deficit:
+    #             cnt +=
+    #             deficit -= w
+
+    #     self.cntr_cross_bal_heuristic = cnt
+
     def is_balanced(self) -> bool:
         """Inputs None, Returns if ship is balanced.
         Balanced ship: mass of the lighter side is within 10% the mass of the heavier side
         (including exactly 10%)
         """
-        # find mass of left and right half
-        left = 0
-        right = 0
-        for row in self.ship_state:
-            for j, cntr in enumerate(row):
-                if j >= 0 and j < self.col / 2:
-                    left += cntr.weight
-                else:
-                    right += cntr.weight
+        left, right, _, _ = self.get_left_right_mass()
 
         # determine if ship is balanced
         if left < right and left >= 0.9 * right:
@@ -351,9 +412,9 @@ class Ship:
             inc = -1
         max_height = left[0]
         for j in range(left[1] + 1, right[1] + 1):
-            while self.ship_state[max_height][j].name != "UNUSED":
+            # todo: is max_height fix ok?
+            while max_height >= 0 and self.ship_state[max_height][j].name != "UNUSED":
                 max_height -= 1
-
         # insert moves up
         for i in range(start_pos[0], max_height - 1, -1):
             coord.append([i, start_pos[1]])
@@ -398,7 +459,7 @@ class Ship:
         self.moves.append([row_get, col_get])
         self.moves.append([row_put, col_put])
 
-    def move_crane(self, col: int):
+    def move_crane(self, col: int, heuristic: str = None):
         """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
@@ -433,8 +494,17 @@ class Ship:
         new_ship.crane_mode = new_crane_mode
 
         # perform move if new_crane_mode is put
+        col_get = self.crane_loc
         if new_crane_mode == "put":
-            get_col = self.crane_loc
-            new_ship.move_cntr(get_col, col)
+            new_ship.move_cntr(col_get, col)
+        # elif new_crane_mode == "get":
+        #     row_get = self.get_col_top_cntr_depth(col_get)
+        #     row_put = self.get_col_top_empty_depth(col)
+        #     new_ship.time_cost += (
+        #         len(new_ship.get_moves([row_get, col_get], [row_put, col])) - 1
+        #     )
+
+        if heuristic == "cntr-cross":
+            new_ship.set_cntr_cross_bal_heuristic()
 
         return new_ship
