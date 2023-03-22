@@ -1,5 +1,5 @@
 from ship import Ship
-
+import pandas as pd
 
 def create_ship(
     manifest_filename: str, op_filename: str, outbound_filename: str
@@ -33,3 +33,10 @@ def create_ship(
     #     f.write(outbound_contents)
 
     return ship1
+
+def unpack_actions(op_filename:str):
+    actions = pd.read_csv(op_filename)
+    # loads = pd.DataFrame
+    # unloads = 
+
+    return actions

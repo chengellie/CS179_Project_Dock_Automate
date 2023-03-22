@@ -16,6 +16,10 @@ class Container:
         """Inputs None. Returns 6-character shortened version of container name."""
         return self.get_shortened_name()
 
+    def get_cntr_info(self) -> str:
+        """Returns all information for the container"""
+        return f"Name: {self.name} \nMCoords: {self.manifest_coord} \nSCoords: {self.ship_coord} \nWeight: {self.weight}"
+
     def get_manifest_format(self) -> str:
         """Inputs None. Returns formatted container for outbound manifest."""
         str_manifest_coord = (
