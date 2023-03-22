@@ -36,7 +36,12 @@ def create_ship(
 
 def unpack_actions(op_filename:str):
     actions = pd.read_csv(op_filename)
-    # loads = pd.DataFrame
-    # unloads = 
+    loads = []
+    unloads = []
+    for i in actions.index:
+        if actions['type'][i] == "Unload":
+            unloads.append([int(x) for x in actions['coords'][i].split('_')])
+        else:
+            loads.extend([actions['name'][i].split('_')*int(actions['qty'][i])])
 
-    return actions
+    return loads, unloads

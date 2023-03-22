@@ -12,7 +12,7 @@ class Ship:
         self.row = 8
         self.col = 12
         self.crane_loc = -1
-        self.crane_mode = "put"
+        self.crane_mode = None
         self.balance_mass = -1
         self.time_cost = 0
         self.cntr_cross_bal_heuristic = 0
@@ -134,9 +134,7 @@ class Ship:
         for row in self.ship_state:
             for cntr in row:
                 ret += cntr.name
-        # if self.crane_mode == "get":
         ret += str(self.crane_loc)
-        # ret += str(self.crane_mode)
         return ret
 
     def get_left_right_mass(self) -> int:
@@ -241,13 +239,16 @@ class Ship:
         for i, row in enumerate(self.cntrs_in_row):
             if (
                 cntr_name in row and orig_cntr.name not in row[cntr_name]
-            ):  # container exists in this row and isn't the original (we can skip)
+            ):  # container exists in this row and isn't the original
                 for pot_cntr_coord in row[cntr_name]:
                     pot_cntr = self.get_cntr(pot_cntr_coord)
-                    pot_cntr_depth = self.get_container_depth(curr_cntr)
+                    pot_cntr_depth = self.get_container_depth(pot_cntr)
                     curr_cntr_depth = self.get_container_depth(curr_cntr)
                     if not pot_cntr.selected:
-                        if (pot_cntr_depth < curr_cntr_depth) or (pot_cntr_depth == curr_cntr_depth and pot_cntr_coord[0] < curr_cntr.ship_coord[0]):   # same depth, which one is higher? (Less crane movement time)
+                        if (pot_cntr_depth < curr_cntr_depth) or (
+                            pot_cntr_depth == curr_cntr_depth
+                            and pot_cntr_coord[0] < curr_cntr.ship_coord[0]
+                        ):  # same depth, which one is higher? (Less crane movement time)
                             unload_cntr.selected = False
                             unload_cntr = pot_cntr
                             unload_cntr.selected = True
@@ -259,9 +260,13 @@ class Ship:
         return self.ship_state[coords[0]][coords[1]]
 
     def add_cntr(self, cntr: Container, col: int) -> None:
+        if not cntr:
+            # print("Add Failed: Empty Container")
+            return
+
         row = self.top_columns[col]
         if row <= -1:
-            print("Full")
+            # print(f"Add Failed: Full Column {col}")
             return
         cntr.set_ship_coord([row, col])
         # cntr.ship_coord = [row, col]
@@ -279,8 +284,8 @@ class Ship:
     def remove_cntr(self, col: int) -> Container:
         row = self.top_columns[col] + 1
 
-        if self.top_columns[col] >= 7 or self.ship_state[row][col].name == "NAN":
-            print("Empty")
+        if row >= 8 or self.ship_state[row][col].name == "NAN":
+            # print(f"Remove Failed: Empty Column {col}")
             return None
 
         # Get container being removed
@@ -302,6 +307,10 @@ class Ship:
 
         return removed_cntr
 
+    def get_col_top_cntr_coord(self, col: int):
+        """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
+        return [self.get_columns[col] + 1, col]
+
     def get_col_top_cntr_depth(self, col: int) -> int:
         """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
         i = 0
@@ -312,6 +321,10 @@ class Ship:
             return -1
         else:
             return i
+
+    def get_col_top_empty_coord(self, col: int):
+        """Inputs column. Returns row index of last empty slot in ship_state or -1 if col is full."""
+        return [self.top_columns[col], col]
 
     def get_col_top_empty_depth(self, col: int) -> int:
         """Inputs column. Returns row index of last empty slot in ship_state or -1 if col is full."""
@@ -349,29 +362,33 @@ class Ship:
             print("Error: uncaught condition for empty column")
             return False
 
-    def get_ship_columns(self, indx: int = -1):
-        """Gets list of all containers of all or a single column. Returns None."""
-        rowlength = len(self.ship_state[0])
-        columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
+    # def get_ship_columns(self, indx: int = -1):
+    #     """Gets list of all containers of all or a single column. Returns None."""
+    #     rowlength = len(self.ship_state[0])
+    #     columns = [[] for i in range(0, rowlength if indx == -1 else 1)]
 
-        for row in self.ship_state:
-            if indx == -1:
-                for i in range(0, rowlength):
-                    columns[i].append(row[i])
-            else:
-                columns[0].append(row[indx])
+    #     for row in self.ship_state:
+    #         if indx == -1:
+    #             for i in range(0, rowlength):
+    #                 columns[i].append(row[i])
+    #         else:
+    #             columns[0].append(row[indx])
 
-        return columns
+    #     return columns
 
-    def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
-        temp = self.ship_state[pos1[0]][pos1[1]]
-        self.ship_state[pos1[0]][pos1[1]] = self.ship_state[pos2[0]][pos2[1]]
-        self.ship_state[pos2[0]][pos2[1]] = temp
-        temp = self.ship_state[pos1[0]][pos1[1]].get_manifest_coord()
-        self.ship_state[pos1[0]][pos1[1]].set_manifest_coord(
-            self.ship_state[pos2[0]][pos2[1]].get_manifest_coord()
-        )
-        self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
+    def swap_cntr(self, col1: int, col2: int) -> None:
+        self.add_cntr(self.remove_cntr(col1), col2)
+
+    # def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
+    #     temp = self.ship_state[pos1[0]][pos1[1]]
+    #     print(temp.name, pos1, pos2)
+    #     self.ship_state[pos1[0]][pos1[1]] = self.ship_state[pos2[0]][pos2[1]]
+    #     self.ship_state[pos2[0]][pos2[1]] = temp
+    #     temp = self.ship_state[pos1[0]][pos1[1]].get_manifest_coord()
+    #     self.ship_state[pos1[0]][pos1[1]].set_manifest_coord(
+    #         self.ship_state[pos2[0]][pos2[1]].get_manifest_coord()
+    #     )
+    #     self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
 
     def get_moves(self, start_pos, end_pos):
         """Input start and end pos. Returns list of coordinates to move container from start to end."""
@@ -386,27 +403,31 @@ class Ship:
             left = end_pos
             right = start_pos
             inc = -1
+
+        # max_height = self.row - min(self.top_columns[(left[1] + 1):(right[1] + 1)]) - 1
         max_height = left[0]
         for j in range(left[1] + 1, right[1] + 1):
-            # todo: is max_height fix ok?
+            # TODO: is max_height fix ok?
             while max_height >= 0 and self.ship_state[max_height][j].name != "UNUSED":
                 max_height -= 1
+
         # insert moves up
         for i in range(start_pos[0], max_height - 1, -1):
             coord.append([i, start_pos[1]])
 
         # insert horizontal moves
-        if inc == 1:
-            for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
-                coord.append([max_height, j])
-        else:
-            for j in range(start_pos[1] - 1, end_pos[1] - 1, -1):
-                coord.append([max_height, j])
+        for j in range(start_pos[1] + inc, end_pos[1] + inc, inc):
+            coord.append([max_height, j])
+        # if inc == 1:
+        #     for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
+        #         coord.append([max_height, j])
+        # else:
+        #     for j in range(start_pos[1] - 1, end_pos[1] - 1, -1):
+        #         coord.append([max_height, j])
 
         # insert moves down
         for i in range(max_height + 1, end_pos[0] + 1, 1):
             coord.append([i, end_pos[1]])
-
         return coord
 
     def move_cntr(self, col_get: int, col_put: int) -> None:
@@ -417,11 +438,14 @@ class Ship:
             return
 
         row_get = self.get_col_top_cntr_depth(col_get)
+        # row_get = self.top_columns[col_get] + 1
+        # if row_get == self.row or self.ship_state[row_get][col_get].name == "NAN":
         if row_get == -1:
             print("Error: No container to get in column", col_get)
             return
 
         row_put = self.get_col_top_empty_depth(col_put)
+        # row_put = self.top_columns[col_put]
         if row_put == -1:
             print("Error: Cannot put container in this column, column is full.")
             return
@@ -429,9 +453,42 @@ class Ship:
         self.time_cost += (
             len(self.get_moves([row_put, col_put], [row_get, col_get])) - 1
         )
-        self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
+        self.swap_cntr(col_get, col_put)
+        # self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
         self.moves.append([row_get, col_get])
         self.moves.append([row_put, col_put])
+
+    def time_from_pink_cell(self, col: int) -> int:
+        """Inputs column to move crane to. Returns cost of moving crane from pink cell to top container of col."""
+        row = self.get_col_top_cntr_depth(col)
+        if row == -1:
+            print("Error: cannot get from column", col)
+            return -1
+        return col + row + 1
+
+    def time_between_col(self, start_col: int, end_col: int) -> int:
+        """Inputs two columns. Returns cost of moving crane from top container of start col to top container of end col"""
+        # return if moving container from and to same col
+        if start_col == end_col:
+            # print("Debug:", start_col, end_col)
+            # print(self)
+            # print("Error: Container is not being moved")
+            return -1
+
+        start_row = self.get_col_top_cntr_depth(start_col)
+        # row_get = self.top_columns[col_get] + 1
+        # if row_get == self.row or self.ship_state[row_get][col_get].name == "NAN":
+        if start_row == -1:
+            # print("Error: No container that was previously put in column", start_col)
+            return -1
+
+        end_row = self.get_col_top_cntr_depth(end_col)
+        # row_put = self.top_columns[col_put]
+        if end_row == -1:
+            print("Error: No container to get from column", end_col)
+            return -1
+        # update cost and moves
+        return len(self.get_moves([start_row, start_col], [end_row, end_col])) - 1
 
     def move_crane(self, col: int, heuristic: str = None):
         """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
@@ -443,42 +500,37 @@ class Ship:
         else:
             print("Error: current crane_mode is not a valid option")
 
-        # check if crane is getting container from empty col
-        if new_crane_mode == "get" and self.is_empty_col(col):
-            # print("get empty", col)
+        # check if crane is getting container from empty col or NAN col
+        if new_crane_mode == "get" and (
+            self.is_empty_col(col) or self.ship_state[0][col].name == "NAN"
+        ):
             return None
 
-        # check if crane is getting container from col of NAN
-        if new_crane_mode == "get" and self.ship_state[0][col].name == "NAN":
-            # print("get NAN", col)
-            return None
-
-        # check if crane is putting container to full col, including col of NAN
+        # check if crane is putting container to full col or NAN col
         if new_crane_mode == "put" and self.is_full_col(col):
-            # print("put full", col)
             return None
 
-        # check crane_loc is not being moved to same col
+        # check crane_loc is not being moved to same col as get
         if new_crane_mode == "put" and col == self.crane_loc:
-            # print("same col", col)
             return None
 
+        # construct new ship with move performed
         new_ship = copy.deepcopy(self)
         new_ship.crane_loc = col
         new_ship.crane_mode = new_crane_mode
 
         # perform move if new_crane_mode is put
-        col_get = self.crane_loc
         if new_crane_mode == "put":
-            new_ship.move_cntr(col_get, col)
-        # elif new_crane_mode == "get":
-        #     row_get = self.get_col_top_cntr_depth(col_get)
-        #     row_put = self.get_col_top_empty_depth(col)
-        #     new_ship.time_cost += (
-        #         len(new_ship.get_moves([row_get, col_get], [row_put, col])) - 1
-        #     )
+            new_ship.move_cntr(self.crane_loc, col)
+        elif new_crane_mode == "get":
+            if self.crane_mode == None:
+                new_ship.time_cost += new_ship.time_from_pink_cell(new_ship.crane_loc)
+            else:
+                new_ship.time_cost += new_ship.time_between_col(
+                    self.crane_loc, new_ship.crane_loc
+                )
 
         if heuristic == "cntr-cross":
             new_ship.set_cntr_cross_bal_heuristic()
-
+        # TODO: if goal_state is reached, still need to move crane back to pink cell and include that in search
         return new_ship

@@ -98,6 +98,7 @@ scratch_ship = shiputil.create_ship(
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
+scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 1)
 scratch_ship.add_cntr(Container([-1,-1], 75, "Dog", [scratch_ship.row, scratch_ship.col]), 0)
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
 scratch_ship.add_cntr(Container([-1,-1], 25, "Rat", [scratch_ship.row, scratch_ship.col]), 0)
@@ -125,11 +126,25 @@ print(scratch_ship.top_columns)
 print(scratch_ship.cntrs_in_row[4])
 
 # Find Best Cat Container
-print("============================== Finding 3 Best Cat Containers")
-test_cntrs = [scratch_ship.get_cntr(cntr_coord) for cntr_coord in [[5, 0], [7, 0], [6, 5]]]
-for cntr in test_cntrs:
+print("============================== Finding 4 Best Cat Containers")
+def setup_cntr(coord:list):
+    cntr = scratch_ship.get_cntr(coord)
     cntr.selected = True
-    print(scratch_ship.find_best_cntr(cntr).get_cntr_info())
+    return cntr
+
+def get_best_cntr(cntr:Container):
+    return scratch_ship.find_best_cntr(cntr)
+
+test_cntrs = [setup_cntr(cntr_coord) for cntr_coord in [[5, 0], [7, 1], [7, 0], [6, 5]]]
+test_cntrs = [get_best_cntr(cntr) for cntr in test_cntrs]
+[print(cntr.get_cntr_info()) for cntr in test_cntrs]
+
+print("============================== Get Moves for Each Cat Container")
+for cntr in test_cntrs:
+    moves = scratch_ship.get_moves(cntr.ship_coord, scratch_ship.get_col_top_empty_coord(2))
+    print(moves)
+print("============================== Move Crane")
+print("============================== Set Heuristics")
 
 
 # unloads = [[6, 4], [4,4]]
@@ -171,7 +186,14 @@ Onload: [Bird, Bird]
 """
 
 # s = shiputil.create_ship(
-#         "ShipCase/ShipCase4.txt",
+#         "ShipCase/ShipCase1.txt",
 #         "load_unload.txt",
 #         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
 #     )
+# t = s.ship_state[7][1]
+# for i in range(0, 10):
+#     s.add_cntr(t, 1)
+# print(s)
+# print(s.top_columns)
+# s.remove_cntr(0)
+# print(s)

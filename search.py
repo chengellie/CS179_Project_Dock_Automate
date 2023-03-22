@@ -80,20 +80,11 @@ def balance_queueing(nodes: Queue, node: Ship, dups: Set[str], row: int, col: in
 
     for i in range(col):
         children.append(node.move_crane(i))
-        # print("new child", children[len(children) - 1])
 
     for child in children:
-        # print("child", child == None, end=" ")
-        # if child == None:
-        #     print()
-        # else:
-        #     print(child.crane_loc, child.crane_mode, "\n", child)
         if child != None and child.generate_ship_key() not in dups:
             nodes.put(child)
-            # print(child.crane_loc, child.crane_mode)
             dups.add(child.generate_ship_key())
-
-    # print("Dups:", len(dups))
 
 
 def priority_balance_queueing(
@@ -116,25 +107,31 @@ def priority_balance_queueing(
                 total_cost += child.cntr_cross_bal_heuristic
             nodes.put(PrioritizedShip(total_cost, child))
             # print(
-            #     "Before: loc:",
+            #     "Before: loc: ",
             #     node.crane_loc,
-            #     "mode:",
+            #     ", mode: ",
             #     node.crane_mode,
-            #     "cost:",
+            #     ", cost: ",
             #     node.time_cost,
-            #     "heuristic:",
+            #     ", heuristic: ",
             #     node.cntr_cross_bal_heuristic,
-            #     "After: loc:",
+            #     sep="",
+            # )
+            # print(
+            #     "After: loc: ",
             #     child.crane_loc,
-            #     "mode:",
+            #     ", mode: ",
             #     child.crane_mode,
-            #     "cost:",
+            #     ", cost: ",
             #     child.time_cost,
-            #     "heuristic:",
+            #     ", heuristic: ",
             #     child.cntr_cross_bal_heuristic,
+            #     sep="",
+            # )
+            # print(
             #     "total:",
             #     total_cost,
-            #     "\n",
+            #     "\nkey:",
             #     child.generate_ship_key(),
             # )
             # print(child)
