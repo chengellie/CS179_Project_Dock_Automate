@@ -11,11 +11,7 @@ from log import Log
 
 if __name__ == "__main__":
     ship = create_ship(
-<<<<<<< Updated upstream
-        "ShipCase/ShipCase1.txt",
-=======
         "ShipCase/ShipCase2.txt",
->>>>>>> Stashed changes
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )

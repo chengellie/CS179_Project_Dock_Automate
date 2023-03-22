@@ -378,8 +378,8 @@ class Ship:
 
     #     return columns
 
-    def swap_cntr(self, col1:int, col2:int) -> None:
-        self.add_cntr(self.remove_cntr(col1), col2) 
+    def swap_cntr(self, col1: int, col2: int) -> None:
+        self.add_cntr(self.remove_cntr(col1), col2)
 
     # def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
     #     temp = self.ship_state[pos1[0]][pos1[1]]
@@ -419,7 +419,7 @@ class Ship:
         # insert horizontal moves
         for j in range(start_pos[1] + inc, end_pos[1] + inc, inc):
             coord.append([max_height, j])
-        
+
         # if inc == 1:
         #     for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
         #         coord.append([max_height, j])
