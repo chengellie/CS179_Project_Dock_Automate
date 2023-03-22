@@ -247,7 +247,10 @@ class Ship:
                     pot_cntr_depth = self.get_container_depth(pot_cntr)
                     curr_cntr_depth = self.get_container_depth(curr_cntr)
                     if not pot_cntr.selected:
-                        if (pot_cntr_depth < curr_cntr_depth) or (pot_cntr_depth == curr_cntr_depth and pot_cntr_coord[0] < curr_cntr.ship_coord[0]):   # same depth, which one is higher? (Less crane movement time)
+                        if (pot_cntr_depth < curr_cntr_depth) or (
+                            pot_cntr_depth == curr_cntr_depth
+                            and pot_cntr_coord[0] < curr_cntr.ship_coord[0]
+                        ):  # same depth, which one is higher? (Less crane movement time)
                             unload_cntr.selected = False
                             unload_cntr = pot_cntr
                             unload_cntr.selected = True

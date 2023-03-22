@@ -2,6 +2,7 @@ from typing import Optional, Set
 from queue import Queue, PriorityQueue
 from ship import Ship
 from shiputil import *
+<<<<<<< Updated upstream
 from util import PrioritizedShip
 from log import Log
 from queue import Queue
@@ -73,6 +74,8 @@ def load_unload_queuing(
             nodes.put(child)
             # print(child.crane_loc, child.crane_mode)
             dups.add(child.generate_ship_key())
+=======
+>>>>>>> Stashed changes
 
 
 def balance_queueing(nodes: Queue, node: Ship, dups: Set[str], row: int, col: int):
@@ -97,16 +100,21 @@ def balance_queueing(nodes: Queue, node: Ship, dups: Set[str], row: int, col: in
 
 
 def priority_balance_queueing(
+<<<<<<< Updated upstream
     nodes: PriorityQueue,
     node: Ship,
     dups: Set[str],
     row: int,
     col: int,
     heuristic: str = None,
+=======
+    nodes: PriorityQueue, node: Ship, dups: Set[str], row: int, col: int
+>>>>>>> Stashed changes
 ):
     children = []
 
     for i in range(col):
+<<<<<<< Updated upstream
         children.append(node.move_crane(i, heuristic))
 
     for child in children:
@@ -138,11 +146,26 @@ def priority_balance_queueing(
             #     child.generate_ship_key(),
             # )
             # print(child)
+=======
+        children.append(node.move_crane(i))
+        # print("new child", children[len(children) - 1])
+
+    for child in children:
+        # print("child", child == None, end=" ")
+        # if child == None:
+        #     print()
+        # else:
+        #     print(child.crane_loc, child.crane_mode, "\n", child)
+        if child != None and child.generate_ship_key() not in dups:
+            nodes.put(child)
+            # print(child.crane_loc, child.crane_mode)
+>>>>>>> Stashed changes
             dups.add(child.generate_ship_key())
 
     # print("Dups:", len(dups))
 
 
+<<<<<<< Updated upstream
 def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]:
     nodes = PriorityQueue()
     problem.set_cntr_cross_bal_heuristic()
@@ -150,13 +173,22 @@ def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]
     if heuristic == "cntr-cross":
         total_cost += problem.cntr_cross_bal_heuristic
     nodes.put(PrioritizedShip(total_cost, problem))
+=======
+def uniform_cost_balance(problem: Ship) -> Optional[Ship]:
+    nodes = PriorityQueue()
+    nodes.put((problem.time_cost, problem))
+>>>>>>> Stashed changes
     dups = set()
     dups.add(problem.generate_ship_key())
     max_queue = 1
     expanded_nodes = 0
 
     while not nodes.empty():
+<<<<<<< Updated upstream
         node = nodes.get().item
+=======
+        node = nodes.get()
+>>>>>>> Stashed changes
         expanded_nodes += 1
         # print(node, node.crane_loc)
 
@@ -165,9 +197,13 @@ def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]
             print(f"Max Queue Size: {max_queue}\nExpanded Nodes: {expanded_nodes}")
             return node
 
+<<<<<<< Updated upstream
         priority_balance_queueing(
             nodes, node, dups, problem.row, problem.col, heuristic
         )
+=======
+        priority_balance_queueing(nodes, node, dups, problem.row, problem.col)
+>>>>>>> Stashed changes
         if nodes.qsize() > max_queue:
             max_queue = nodes.qsize()
 
