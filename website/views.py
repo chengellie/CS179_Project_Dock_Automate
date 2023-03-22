@@ -33,6 +33,13 @@ current_ship = ''
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
+    csvfile = open("data/action_list.csv", "w")
+    csvfile.truncate()
+    csvfile.close()
+    with open('data/action_list.csv', mode = 'a', newline='') as csvfile:
+            file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file_writer.writerow(['name','qty','type','coords','weight'])
+
     global current_user
     if request.method == 'POST':
         global current_user
@@ -45,6 +52,7 @@ def selection1():
     global current_user
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
+    data.pop(0)
     row = len(data)
     return render_template("selection1.html", data = data, row = row, user = current_user)
 
@@ -64,10 +72,11 @@ def unload():
             for i in unload:
                 print(i)
                 name,position = i.split('__')
-                file_writer.writerow([name,1,'Unload',position])
+                file_writer.writerow([name,1,'Unload',position,"N/A"])
 
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
+    data.pop(0)
     row = len(data)
 
     return render_template("unload.html", content = item, data = data, row = row, user = current_user)
@@ -82,10 +91,11 @@ def load():
         load_count = request.form.get('item_count')
         with open('data/action_list.csv', mode = 'a', newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            file_writer.writerow([load_name,load_count,'Load','N/A'])
+            file_writer.writerow([load_name,load_count,'Load','N/A',load_weight])
             
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
+    data.pop(0)
     row = len(data)
 
     return render_template('load.html', data = data, row = row, user = current_user)
@@ -102,21 +112,20 @@ def table():
     row = len(item)
     col = len(item[0])
     color = ["rgb(44, 174, 214)", "red"]
-    at = ["ship_7_1", "ship_6_1"]
-    go = ["ship_6_1", "ship_5_1"]
-    moves = get_moves(ship, [7, 1], [7, 4])
-    for i, ls in enumerate(moves):
-        moves[i] = "#ship_" + str(moves[i][0]) + "_" + str(moves[i][1])
-    print(moves)
+    moves = []
+    moves.append(ship.get_moves([0, 4], [6, 6]))
+    moves.append(ship.get_moves([1, 4], [5, 6]))
+    for j in range(len(moves)):
+        for i, ls in enumerate(moves[j]):
+            moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
     # moves = ["ship_7_1", "ship_6_1", "ship_5_1"]
+    print(moves)
     return render_template(
         "table.html",
         item=item,
         color=color,
         row=row,
         col=col,
-        at=at,
-        go=go,
         moves=moves,
         user = current_user,
     )
