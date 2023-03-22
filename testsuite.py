@@ -140,9 +140,6 @@ test_cntrs = [get_best_cntr(cntr) for cntr in test_cntrs]
 [print(cntr.get_cntr_info()) for cntr in test_cntrs]
 
 print("============================== Get Moves for Each Cat Container")
-for i in range(0, 8):
-    scratch_ship.add_cntr(Container([-1,-1], 75, "Dog", [scratch_ship.row, scratch_ship.col]), 1)
-print(scratch_ship)
 for cntr in test_cntrs:
     moves = scratch_ship.get_moves(cntr.ship_coord, scratch_ship.get_col_top_empty_coord(2))
     print(moves)

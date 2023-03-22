@@ -378,16 +378,16 @@ class Ship:
     def swap_cntr(self, col1:int, col2:int) -> None:
         self.add_cntr(self.remove_cntr(col1), col2) 
 
-    def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
-        temp = self.ship_state[pos1[0]][pos1[1]]
-        print(temp.name, pos1, pos2)
-        self.ship_state[pos1[0]][pos1[1]] = self.ship_state[pos2[0]][pos2[1]]
-        self.ship_state[pos2[0]][pos2[1]] = temp
-        temp = self.ship_state[pos1[0]][pos1[1]].get_manifest_coord()
-        self.ship_state[pos1[0]][pos1[1]].set_manifest_coord(
-            self.ship_state[pos2[0]][pos2[1]].get_manifest_coord()
-        )
-        self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
+    # def swap_cntr_pos(self, pos1: List[int], pos2: List[int]) -> None:
+    #     temp = self.ship_state[pos1[0]][pos1[1]]
+    #     print(temp.name, pos1, pos2)
+    #     self.ship_state[pos1[0]][pos1[1]] = self.ship_state[pos2[0]][pos2[1]]
+    #     self.ship_state[pos2[0]][pos2[1]] = temp
+    #     temp = self.ship_state[pos1[0]][pos1[1]].get_manifest_coord()
+    #     self.ship_state[pos1[0]][pos1[1]].set_manifest_coord(
+    #         self.ship_state[pos2[0]][pos2[1]].get_manifest_coord()
+    #     )
+    #     self.ship_state[pos2[0]][pos2[1]].set_manifest_coord(temp)
 
     def get_moves(self, start_pos, end_pos):
         """Input start and end pos. Returns list of coordinates to move container from start to end."""
@@ -402,6 +402,8 @@ class Ship:
             left = end_pos
             right = start_pos
             inc = -1
+
+        # max_height = self.row - min(self.top_columns[(left[1] + 1):(right[1] + 1)]) - 1
         max_height = left[0]
         for j in range(left[1] + 1, right[1] + 1):
             # TODO: is max_height fix ok?
@@ -412,12 +414,15 @@ class Ship:
             coord.append([i, start_pos[1]])
 
         # insert horizontal moves
-        if inc == 1:
-            for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
-                coord.append([max_height, j])
-        else:
-            for j in range(start_pos[1] - 1, end_pos[1] - 1, -1):
-                coord.append([max_height, j])
+        for j in range(start_pos[1] + inc, end_pos[1] + inc, inc):
+            coord.append([max_height, j])
+        
+        # if inc == 1:
+        #     for j in range(start_pos[1] + 1, end_pos[1] + 1, 1):
+        #         coord.append([max_height, j])
+        # else:
+        #     for j in range(start_pos[1] - 1, end_pos[1] - 1, -1):
+        #         coord.append([max_height, j])
 
         # insert moves down
         for i in range(max_height + 1, end_pos[0] + 1, 1):

@@ -11,7 +11,7 @@ from log import Log
 
 if __name__ == "__main__":
     ship = create_ship(
-        "ShipCase/ShipCase3.txt",
+        "ShipCase/ShipCase1.txt",
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
     )
