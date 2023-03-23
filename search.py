@@ -7,66 +7,30 @@ from queue import Queue
 from container import Container
 
 
-def load_unload(orig_ship: Ship, unloads: list[Container], loads: list[Container]):
-    
-
-    return [orig_ship.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
-
-    nodes = Queue()
-    nodes.put(orig_ship)
-    dups = set()
-    dups.add(orig_ship.generate_ship_key())
-    max_queue = 1
-    expanded_nodes = 0
-
-    while not nodes.empty():
-        node = nodes.get()
-        expanded_nodes += 1
-        # print(node, node.crane_loc)
-
-        # if node.is_balanced():
-        #     print(node)
-        #     print(f"Max Queue Size: {max_queue}\nExpanded Nodes: {expanded_nodes}")
-        #     return node
-
-        load_unload_queuing(
-            nodes,
-            node,
-            dups,
-            [node.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads],
-            loads,
-        )
-        # balance_queueing(nodes, node, dups, problem.row, problem.col)
-        # if nodes.qsize() > max_queue:
-        #     max_queue = nodes.qsize()
-
-    print("Error: unsolvable ship")
-    return None
-    # ship.init_goal_state([ship.ship_state[cntr[0], cntr[1]].name for cntr in loads], [ship.ship_state[cntr[0], cntr[1]].name for cntr in unloads])
+# def load_unload(orig_ship: Ship, unloads: list[Container], loads: list[Container]):
 
 
-def load_unload_queuing(
-    nodes: Queue,
+#     return [orig_ship.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
+
+
+def priority_lu_queueing(
+    nodes: PriorityQueue,
     node: Ship,
     dups: Set[str],
-    unloads: list = [Container],
-    loads: list = [Container],
+    row: int,
+    col: int,
+    heuristic: str = None,
 ):
     children = []
 
-    for i in range(col):
-        children.append(node.move_crane(i))
-        # print("new child", children[len(children) - 1])
+    # col 12 used for when crane is in loading area
+    for i in range(col + 1):
+        children.append(node.move_crane(i, heuristic))
 
     for child in children:
-        # print("child", child == None, end=" ")
-        # if child == None:
-        #     print()
-        # else:
-        #     print(child.crane_loc, child.crane_mode, "\n", child)
         if child != None and child.generate_ship_key() not in dups:
-            nodes.put(child)
-            # print(child.crane_loc, child.crane_mode)
+            total_cost = child.time_cost
+            nodes.put(PrioritizedShip(total_cost, child))
             dups.add(child.generate_ship_key())
 
 
@@ -89,7 +53,10 @@ def priority_balance_queueing(
     row: int,
     col: int,
     heuristic: str = None,
-):
+) -> None:
+    """Inputs priority queue, current ship, duplicates, ship size, heuristic type.
+    Expand current node and add all valid children to priority queue. Returns None.
+    """
     children = []
 
     for i in range(col):
@@ -133,6 +100,32 @@ def priority_balance_queueing(
             dups.add(child.generate_ship_key())
 
     # print("Dups:", len(dups))
+
+
+def uniform_cost_lu(problem: Ship, heuristic: str = None) -> Optional[Ship]:
+    nodes = PriorityQueue()
+    total_cost = problem.time_cost
+    nodes.put(PrioritizedShip(total_cost, problem))
+    dups = set()
+    dups.add(problem.generate_ship_key())
+    max_queue = 1
+    expanded_nodes = 0
+
+    while not nodes.empty():
+        node = nodes.get().item
+        expanded_nodes += 1
+
+        if node.is_goal_state():
+            print(node)
+            print(f"Max Queue Size: {max_queue}\nExpanded Nodes: {expanded_nodes}")
+            return node
+
+        priority_lu_queueing(nodes, node, dups, problem.row, problem.col, heuristic)
+        if nodes.qsize() > max_queue:
+            max_queue = nodes.qsize()
+
+    print("Error: unsolvable ship")
+    return None
 
 
 def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]:
