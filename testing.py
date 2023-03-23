@@ -144,13 +144,16 @@ print(scratch_ship.cntrs_in_row[4])
 #     print(moves)
 
 test_log_file.write("============================== Unpack Container Actions\n")
-loads, unloads = util.unpack_actions(op_filename, scratch_ship.row, scratch_ship.col)
+loads, unloads = util.unpack_actions(scratch_ship, op_filename, scratch_ship.row, scratch_ship.col)
+test_log_file.write("--------- Unloads\n")
+[test_log_file.write(u.get_cntr_info() + "\n") for u in unloads]
+test_log_file.write("--------- Loads\n")
 [test_log_file.write(l.get_cntr_info() + "\n") for l in loads]
 print(unloads)
 
 test_log_file.write("============================== Find Best Containers for Unpacked Actions\n")
-unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
-unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unload_cntrs]
+# unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
+unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unloads]
 [test_log_file.write(cntr.get_cntr_info() + "\n") for cntr in unload_cntrs]
 
 test_log_file.write("============================== Log Writing\n")
