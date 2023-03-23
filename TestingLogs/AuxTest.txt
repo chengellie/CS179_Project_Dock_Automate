@@ -1,0 +1,22 @@
+#######################################
+Auxiliary Testing - All Functionalities
+#######################################
+============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers
+============================== Remove 4 Containers From Col 4
+============================== Unpack Container Actions
+============================== Find Best Containers for Unpacked Actions
+Name: Rat 
+MCoords: [4, 1] 
+SCoords: [4, 0] 
+Weight: 25
+Name: Cat 
+MCoords: [1, 2] 
+SCoords: [7, 1] 
+Weight: 50
+Name: Elephant 
+MCoords: [3, 4] 
+SCoords: [5, 3] 
+Weight: 300
+============================== Log Writing
+============================== Unload/Load Search
+============================== Ship Balancing
