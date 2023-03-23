@@ -7,14 +7,10 @@ from queue import Queue
 from container import Container
 
 
-def load_unload(orig_ship: Ship, unloads: list = [[int]], loads: list = [Container]):
-    def coord_to_cntr(cntr: list, selecting: bool = True) -> Container:
-        selected_cntr = orig_ship.get_cntr(cntr)
-        selected_cntr.selected = selecting
+def load_unload(orig_ship: Ship, unloads: list[Container], loads: list[Container]):
+    
 
-        return selected_cntr
-
-    return [node.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
+    return [orig_ship.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
 
     nodes = Queue()
     nodes.put(orig_ship)

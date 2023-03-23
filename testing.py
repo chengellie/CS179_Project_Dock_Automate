@@ -128,29 +128,35 @@ print(scratch_ship.top_columns)
 print(scratch_ship.cntrs_in_row[4])
 
 # Find Best Cat Container
-print("============================== Finding 4 Best Cat Containers")
-def setup_cntr(coord:list):
-    cntr = scratch_ship.get_cntr(coord)
-    cntr.selected = True
-    return cntr
+# print("============================== Finding 4 Best Cat Containers")
+# # def setup_cntr(coord:list):
+# #     cntr = scratch_ship.get_cntr(coord)
+# #     cntr.selected = True
+# #     return cntr
+# test_cntrs = [util.setup_cntr(scratch_ship, cntr_coord) for cntr_coord in [[5, 0], [7, 1], [7, 0], [6, 5]]]
+# test_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in test_cntrs]
+# [print(cntr.get_cntr_info()) for cntr in test_cntrs]
 
-def get_best_cntr(cntr:Container):
-    return scratch_ship.find_best_cntr(cntr)
+# print("============================== Get Moves for Each Cat Container")
+# for cntr in test_cntrs:
+#     moves = scratch_ship.get_moves(cntr.ship_coord, scratch_ship.get_col_top_empty_coord(2))
+#     print(moves)
 
-test_cntrs = [setup_cntr(cntr_coord) for cntr_coord in [[5, 0], [7, 1], [7, 0], [6, 5]]]
-test_cntrs = [get_best_cntr(cntr) for cntr in test_cntrs]
-[print(cntr.get_cntr_info()) for cntr in test_cntrs]
-
-print("============================== Get Moves for Each Cat Container")
-for cntr in test_cntrs:
-    moves = scratch_ship.get_moves(cntr.ship_coord, scratch_ship.get_col_top_empty_coord(2))
-    print(moves)
-print("============================== Move Crane")
-print("============================== Set Heuristics")
 print("============================== Unpack Container Actions")
 loads, unloads = util.unpack_actions(op_filename, scratch_ship.row, scratch_ship.col)
 [print(l.get_cntr_info()) for l in loads]
 print(unloads)
+
+print("============================== Find Best Containers for Unpacked Actions")
+unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
+unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unload_cntrs]
+[print(cntr.get_cntr_info()) for cntr in unload_cntrs]
+
+print("============================== Unload/Load Search")
+
+print("============================== Ship Balancing")
+
+
 # unloads = [[6, 4], [4,4]]
 # loads = [Container([-1, -1], i, f"Test {i}", [scratch_ship.row, scratch_ship.col]) for i in range(0, 4)]
 # search.load_unload(a, unloads=unloads)

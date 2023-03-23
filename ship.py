@@ -237,9 +237,7 @@ class Ship:
 
         # compute depth and choose this container if smaller depth (preferably choose one in higher point)
         for i, row in enumerate(self.cntrs_in_row):
-            if (
-                cntr_name in row and orig_cntr.name not in row[cntr_name]
-            ):  # container exists in this row and isn't the original
+            if (cntr_name in row and orig_cntr.ship_coord not in row[cntr_name]):  # container exists in this row and isn't the original
                 for pot_cntr_coord in row[cntr_name]:
                     pot_cntr = self.get_cntr(pot_cntr_coord)
                     pot_cntr_depth = self.get_container_depth(pot_cntr)
