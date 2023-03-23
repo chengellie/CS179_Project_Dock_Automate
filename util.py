@@ -10,6 +10,7 @@ class PrioritizedShip:
     priority: int
     item: Any = field(compare=False)
 
+
 def create_ship(
     manifest_filename: str, op_filename: str, outbound_filename: str
 ) -> Ship:
@@ -24,27 +25,40 @@ def create_ship(
     ship = Ship()
     ship.init_ship_state_manifest(manifest_cntnt)
 
+    cntr1 = Container([0, 0], 5, "Cat", [ship.row, ship.col])
+    cntr2 = Container([0, 0], 10, "Cat", [ship.row, ship.col])
+    loads = []
+    ship.ship_state[7][1].selected = True
+    ship.init_goal_state(loads, {})
+
     return ship
 
-def unpack_actions(op_filename:str, row:int, col:int):
+
+def unpack_actions(op_filename: str, row: int, col: int):
     actions = pd.read_csv(op_filename)
     loads = []
     unloads = []
     for i in actions.index:
-        if actions['type'][i] == "Unload":
-            unloads.append([int(x) for x in actions['coords'][i].split('_')])
+        if actions["type"][i] == "Unload":
+            unloads.append([int(x) for x in actions["coords"][i].split("_")])
         else:
-            for j in range(0, int(actions['qty'][i])):
-                loads.append(Container([-1, -1], actions['weight'][i], actions['name'][i], [row, col]))
-                    
+            for j in range(0, int(actions["qty"][i])):
+                loads.append(
+                    Container(
+                        [-1, -1], actions["weight"][i], actions["name"][i], [row, col]
+                    )
+                )
+
             # loads.extend([actions['name'][i]]*int(actions['qty'][i]))
 
     return loads, unloads
+
 
 def setup_cntr(ship: Ship, cntr: list, selecting: bool = True) -> Container:
     selected_cntr = ship.get_cntr(cntr)
     selected_cntr.selected = selecting
 
     return selected_cntr
+
 
 # TODO: Make Unmark Container Function
