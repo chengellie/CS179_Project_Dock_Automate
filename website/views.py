@@ -132,7 +132,8 @@ def table():
 
 @notes.route("/" , methods = ['GET','POST'])
 def note():
+    global current_user
     if request.method == 'POST':
         user_note = request.form.get('user_note')
         print(user_note)
-    return render_template("notes.html")
+    return render_template("notes.html",user = current_user)

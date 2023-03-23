@@ -88,15 +88,16 @@ manifest = "ShipCase/emptyship.txt"
 op_filename = "data/action_list.csv"
 outbound = "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt"
 
-print(
-"""
-#######################################
+test_log_file_path = "TestingLogs/"
+test_log_file = open(test_log_file_path + "AuxTest.txt", 'w')
+test_log_file.write(
+"""#######################################
 Auxiliary Testing - All Functionalities
 #######################################
 """
 )
 # Loading a Manifest to Build Ship From Scratch and Adding Containers
-print("============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers")
+test_log_file.write("============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers\n")
 scratch_ship = util.create_ship(manifest, op_filename, outbound)
 
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
@@ -117,7 +118,7 @@ scratch_ship.add_cntr(Container([-1,-1], 30, "Bird", [scratch_ship.row, scratch_
 print(scratch_ship)
 
 # Remove a container
-print("============================== Remove 4 Containers From Col 4")
+test_log_file.write("============================== Remove 4 Containers From Col 4\n")
 for i in range(0, 4):
     rm_cntr = scratch_ship.remove_cntr(4)
 
@@ -142,20 +143,27 @@ print(scratch_ship.cntrs_in_row[4])
 #     moves = scratch_ship.get_moves(cntr.ship_coord, scratch_ship.get_col_top_empty_coord(2))
 #     print(moves)
 
-print("============================== Unpack Container Actions")
-loads, unloads = util.unpack_actions(op_filename, scratch_ship.row, scratch_ship.col)
-[print(l.get_cntr_info()) for l in loads]
+test_log_file.write("============================== Unpack Container Actions\n")
+loads, unloads = util.unpack_actions(scratch_ship, op_filename, scratch_ship.row, scratch_ship.col)
+test_log_file.write("--------- Unloads\n")
+[test_log_file.write(u.get_cntr_info() + "\n") for u in unloads]
+test_log_file.write("--------- Loads\n")
+[test_log_file.write(l.get_cntr_info() + "\n") for l in loads]
 print(unloads)
 
-print("============================== Find Best Containers for Unpacked Actions")
-unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
-unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unload_cntrs]
-[print(cntr.get_cntr_info()) for cntr in unload_cntrs]
+test_log_file.write("============================== Find Best Containers for Unpacked Actions\n")
+# unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
+unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unloads]
+[test_log_file.write(cntr.get_cntr_info() + "\n") for cntr in unload_cntrs]
 
-print("============================== Unload/Load Search")
+test_log_file.write("============================== Log Writing\n")
+log = Log("auxtestlog")
+# log.writelog("Testing Log")
+# log.writecomment("Good Day Sir")
+# log.readlog(printlog=True)
+test_log_file.write("============================== Unload/Load Search\n")
 
-print("============================== Ship Balancing")
-
+test_log_file.write("============================== Ship Balancing\n")
 
 # unloads = [[6, 4], [4,4]]
 # loads = [Container([-1, -1], i, f"Test {i}", [scratch_ship.row, scratch_ship.col]) for i in range(0, 4)]

@@ -34,13 +34,15 @@ def create_ship(
     return ship
 
 
-def unpack_actions(op_filename: str, row: int, col: int):
+def unpack_actions(ship: Ship, op_filename: str, row: int, col: int):
     actions = pd.read_csv(op_filename)
     loads = []
     unloads = []
     for i in actions.index:
         if actions["type"][i] == "Unload":
-            unloads.append([int(x) for x in actions["coords"][i].split("_")])
+            unloads.append(
+                setup_cntr(ship, [int(x) for x in actions["coords"][i].split("_")])
+            )
         else:
             for j in range(0, int(actions["qty"][i])):
                 loads.append(
