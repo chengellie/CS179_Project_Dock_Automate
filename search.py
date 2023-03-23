@@ -1,8 +1,7 @@
 from typing import Optional, Set
 from queue import Queue, PriorityQueue
 from ship import Ship
-from shiputil import *
-from util import PrioritizedShip
+from util import *
 from log import Log
 from queue import Queue
 from container import Container
