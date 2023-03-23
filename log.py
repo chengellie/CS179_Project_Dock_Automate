@@ -15,33 +15,40 @@ self.logfile = the log file name
 class Log:
     # Private Functions #
     def __init__(self, logname):
+        # Testing
+        self.filepath = logname
+        self.logfile = f"{logname}{self.__append_year(year)}.txt"    # TODO: Change to variable year
+        
+        file_exists, self.logfile = self.__find_valid_log()
+        
         # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
-        self.filepath = os.path.expanduser(f"~/Documents/.DockAutomate") # MacOS/Linux
+        # self.filepath = os.path.expanduser(f"~/Documents/.DockAutomate") # MacOS/Linux
         
-        if not os.path.exists(self.filepath):
-            os.mkdir(self.filepath)
-            os.system(f"attrib +h {self.filepath}")
         
-        # If Log file does not exist, create a new one and set necessary permissions
-        file_exists, self.logfile = self.__find_valid_log(logname)
-        if not file_exists:
-            print("No file, would you like to create a new one") # TODO: Change to match customer
-            print("The log file has the logical year appended to its name. What year do you want the log file?")
+        # if not os.path.exists(self.filepath):
+        #     os.mkdir(self.filepath)
+        #     os.system(f"attrib +h {self.filepath}")
+        
+        # # If Log file does not exist, create a new one and set necessary permissions
+        # file_exists, self.logfile = self.__find_valid_log(logname)
+        # if not file_exists:
+        #     print("No file, would you like to create a new one") # TODO: Change to match customer
+        #     print("The log file has the logical year appended to its name. What year do you want the log file?")
             
-            # Create new log file in filepath
-            self.logfile = f".{logname}2023.txt"    # TODO: Change to variable year
-            # self.filepath += f"\\{self.logfile}"  # Windows
-            self.filepath += f"/{self.logfile}" # MacOS/Linux
-            f = open(self.filepath, "w")
-            f.close()
+        #     # Create new log file in filepath
+        #     self.logfile = f".{logname}2023.txt"    # TODO: Change to variable year
+        #     # self.filepath += f"\\{self.logfile}"  # Windows
+        #     self.filepath += f"/{self.logfile}" # MacOS/Linux
+        #     f = open(self.filepath, "w")
+        #     f.close()
             
-            # Set attributes to protect log file
-            # os.system(f"attrib +h {self.filepath}")
-            self.__read_only()
-        else:
-            # self.filepath += f"\\{self.logfile}"  # Windows
-            self.filepath += f"/{self.logfile}" # MacOS/Linux
-            print(self.filepath)
+        #     # Set attributes to protect log file
+        #     # os.system(f"attrib +h {self.filepath}")
+        #     self.__read_only()
+        # else:
+        #     # self.filepath += f"\\{self.logfile}"  # Windows
+        #     self.filepath += f"/{self.logfile}" # MacOS/Linux
+        #     print(self.filepath)
         
     def __write_enable(self):
         os.chmod(self.filepath, S_IWUSR|S_IREAD)

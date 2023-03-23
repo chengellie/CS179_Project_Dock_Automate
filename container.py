@@ -1,6 +1,5 @@
 from typing import List
 
-
 class Container:
     def __init__(
         self, manifest_coord: List[int], weight: int, name: str, ship_size: List[int]
