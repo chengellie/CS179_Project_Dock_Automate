@@ -7,10 +7,10 @@ from queue import Queue
 from container import Container
 
 
-def load_unload(orig_ship: Ship, unloads: list[Container], loads: list[Container]):
-    
+# def load_unload(orig_ship: Ship, unloads: list[Container], loads: list[Container]):
 
-    return [orig_ship.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
+
+#     return [orig_ship.find_best_cntr(coord_to_cntr(cntr, True)) for cntr in unloads]
 
 
 def priority_lu_queueing(
