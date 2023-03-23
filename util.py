@@ -40,3 +40,11 @@ def unpack_actions(op_filename:str, row:int, col:int):
             # loads.extend([actions['name'][i]]*int(actions['qty'][i]))
 
     return loads, unloads
+
+def setup_cntr(ship: Ship, cntr: list, selecting: bool = True) -> Container:
+    selected_cntr = ship.get_cntr(cntr)
+    selected_cntr.selected = selecting
+
+    return selected_cntr
+
+# TODO: Make Unmark Container Function

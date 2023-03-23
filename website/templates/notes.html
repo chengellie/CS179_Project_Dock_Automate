@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %} Home {% endblock %}
+{% block content %}
+
+<br><br>
+<div class="w3-row-padding">
+    <div class="w3-third w3-container">
+        <h5> </h5>
+    </div>
+    <div class="w3-third">
+
+    <form class="w3-container w3-card-4" method="post">
+      <br></br>
+      <h2>Operator Notes:</h2>
+      <div class="w3-section">
+        <textarea id="user_note" name="user_note" rows="4" cols="40"></textarea>
+      </div>
+      <br></br>
+      <div class="w3-center">
+          <button class="w3-button w3-theme">Enter</button>
+      </div>
+      <br></br>
+
+    </form>
+    </div>
+</div>
+<br><br>
+
+{% endblock %}

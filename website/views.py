@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, json, request, redirect
 import csv
 from ship import Ship
-from shiputil import *
+from util import *
 import os
 import sys
 
@@ -11,6 +11,7 @@ selection_1 = Blueprint("selection_1", __name__)
 tables = Blueprint("tables", __name__)
 unloading = Blueprint("unloading", __name__)
 loading = Blueprint("loading", __name__)
+notes = Blueprint('notes',__name__)
 
 current_user = ''
 current_ship = ''
@@ -70,7 +71,6 @@ def unload():
         with open('data/action_list.csv', mode = 'a',newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in unload:
-                print(i)
                 name,position = i.split('__')
                 file_writer.writerow([name,1,'Unload',position,"N/A"])
 
@@ -100,7 +100,7 @@ def load():
 
     return render_template('load.html', data = data, row = row, user = current_user)
 
-@tables.route("/")
+@tables.route("/", methods = ['GET','POST'])
 def table():
     global current_user
     ship = create_ship(
@@ -129,3 +129,10 @@ def table():
         moves=moves,
         user = current_user,
     )
+
+@notes.route("/" , methods = ['GET','POST'])
+def note():
+    if request.method == 'POST':
+        user_note = request.form.get('user_note')
+        print(user_note)
+    return render_template("notes.html")
