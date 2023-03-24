@@ -54,17 +54,15 @@ class Log:
                 self.year = int(self.logname[-8:-4])
         else:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{self.year}.txt")
-        self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{2023}.txt")
+        print(self.valid_log)
+        # self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{2023}.txt")
     
     """Search through ~\.DockAutomate directory for a valid Log file"""
     def __find_valid_files(self, filename:str):
         re_filename = re.compile(filename)
         for file in os.listdir(self.filepath):
-            # if re_filename in file:
             if re_filename.fullmatch(file):
                 return True, file
-                # num_files += 1
-                # matching_files.append(file)# Modify to consider multiple and take largest one
 
         return False, None
 
@@ -92,13 +90,14 @@ class Log:
     # Public Functions #
     """write formatted log into log file"""
     def writelog(self, action):
-        if self.logfile.closed:
-            return False
+        with open(self.logfile, 'a') as logfile:
+            if logfile.closed:
+                return False
 
-        curr_month = datetime.now().strftime("%B")
-        curr_time = datetime.now().ctime()[4:].split()[1:]
+            curr_month = datetime.now().strftime("%B")
+            curr_time = datetime.now().ctime()[4:].split()[1:]
 
-        self.logfile.write(f"{curr_month} {self.__day_suffix(int(curr_time[0]))} {curr_time[2]}: {curr_time[1][:-3]} {action}\n".encode())
+            logfile.write(f"{curr_month} {self.__day_suffix(int(curr_time[0]))} {curr_time[2]}: {curr_time[1][:-3]} {action}\n")
         self.new = False
         self.__update_json()
 
@@ -106,27 +105,31 @@ class Log:
     
     """write a user comment into log file"""
     def writecomment(self, comment:str):
+        print(comment)
         comment = comment.replace('\n', ' ')
         return self.writelog(f"Comment: {comment.strip()}")
 
     def create_log_file(self, year:int):
-        self.logfile = open(f"{self.filepath}\\{self.name}{year}.txt", 'ab+')
+        self.logfile = f"{self.filepath}\\{self.name}{year}.txt"
+        self.valid_log = True
+        with open(self.logfile, 'ab+') as logfile:
+            pass
         self.year = year
         self.__update_json()
 
-    def open_log_file(self) -> int: # 0 no valid log file
-        if not self.valid_log:  # no valid log files found or default config
+    def open_log_file(self) -> int:
+        if not self.valid_log:  # no valid log files -> create a new one
             return 0
+        self.logfile = self.filepath + f"\\{self.logname}"
 
-        self.logfile = open(self.filepath + f"\\{self.logname}", 'ab+')
+        if not self.new and self.valid_log:
+            with open(self.logfile, 'ab+') as logfile:
+                logfile.seek(-2, 2)    # initial seek behind first line
+                while logfile.read(1) != b'\n':
+                    logfile.seek(-2, 1)
+                last_action = logfile.readline().decode()
+                
+                if "Moved" in last_action or "Offload" in last_action or "Onload" in last_action:   # was in the middle of an operation list
+                    return 2    # operation list interruption detected -> resync
 
-        if not self.new:
-            self.logfile.seek(-2, 2)    # initial seek behind first line
-            while self.logfile.read(1) != b'\n':
-                self.logfile.seek(-2, 1)
-            last_action = self.logfile.readline().decode()
-            
-            if "Moved" in last_action or "Offload" in last_action or "Onload" in last_action:   # was in the middle of an operation list
-                return 2
-
-        return 1
+        return 1    # normal -> do nothing
