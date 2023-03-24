@@ -18,6 +18,7 @@ class Ship:
         self.balance_mass = -1
         self.time_cost = 0
         self.cntr_cross_bal_heuristic = 0
+        self.cntr_lu_heuristic = 0
         self.col_move_bal_heuristic = 0
         self.moves = []
         self.cntrs_in_row = []
@@ -182,6 +183,11 @@ class Ship:
 
         self.cntr_cross_bal_heuristic = cnt
 
+    def set_cntr_lu_heuristic(self) -> None:
+        cnt = 0
+        for cntr in unloads:
+            cnt += self.get_container_depth(cntr)
+        self.cntr_lu_heuristic = cnt
     # def set_col_move_bal_heuristic(self) -> None:
     #     """Inputs None, computes heuristic for balance. Returns None.
     #     h(n) = minimum number of columns to move the minimum number of containers across mid-line to achieve balanced ship

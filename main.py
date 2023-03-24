@@ -36,10 +36,8 @@ def load_unload_ship(ship: Ship):
 
 
 if __name__ == "__main__":
-    ship = create_ship_balance(
-        "ShipCase/ShipCase1.txt",
-        "load_unload.txt",
-        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    ship = create_ship(
+        "ShipCase/ShipCase4.txt"
     )
     print(ship)
 
@@ -47,8 +45,8 @@ if __name__ == "__main__":
     # print(ship.time_between_col(0, 1))
     # print(ship.time_between_col(8, 3))
     # print(ship.get_moves([7, 8], [6, 3]))
-    # balance(ship)
-    load_unload_ship(ship)
+    balance(ship)
+    # load_unload_ship(ship)
 
     # Keep these commented unless testing logs
     # log = Log("testlog")

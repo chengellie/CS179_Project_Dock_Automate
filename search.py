@@ -108,6 +108,16 @@ def priority_balance_queueing(
 
 
 def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]:
+    all_weights = []
+    for i in range(0, problem.col):
+        for j in range(problem.top_columns[i] + 1, problem.row):
+            all_weights.append(problem.ship_state[j][i].weight)
+
+    all_weights.sort(reverse=True)
+    if all_weights[0] * 0.9 > sum(all_weights[1:]):
+        print("Error: unsolvable ship")
+        return None
+
     nodes = PriorityQueue()
     problem.set_cntr_cross_bal_heuristic()
     total_cost = problem.time_cost
