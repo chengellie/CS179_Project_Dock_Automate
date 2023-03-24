@@ -52,9 +52,9 @@ class Log:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}\d+.txt")
             if self.valid_log:
                 self.year = int(self.logname[-8:-4])
+                self.__update_json()
         else:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{self.year}.txt")
-        print(self.valid_log)
         # self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{2023}.txt")
     
     """Search through ~\.DockAutomate directory for a valid Log file"""
@@ -105,13 +105,12 @@ class Log:
     
     """write a user comment into log file"""
     def writecomment(self, comment:str):
-        print(comment)
         comment = comment.replace('\n', ' ')
         return self.writelog(f"Comment: {comment.strip()}")
 
     def create_log_file(self, year:int):
         self.logfile = f"{self.filepath}\\{self.name}{year}.txt"
-        self.valid_log = True
+        self.new = True
         with open(self.logfile, 'ab+') as logfile:
             pass
         self.year = year
@@ -122,7 +121,7 @@ class Log:
             return 0
         self.logfile = self.filepath + f"\\{self.logname}"
 
-        if not self.new and self.valid_log:
+        if not self.new:
             with open(self.logfile, 'ab+') as logfile:
                 logfile.seek(-2, 2)    # initial seek behind first line
                 while logfile.read(1) != b'\n':
