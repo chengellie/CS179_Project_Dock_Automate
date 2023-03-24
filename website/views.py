@@ -25,7 +25,7 @@ def refresh_ship():
     global ship
     global item
     ship = create_ship(
-        "ShipCase/ShipCase2.txt",
+        "ShipCase/ShipCase1.txt",
     )
     item = copy.deepcopy(ship.ship_state)
 
