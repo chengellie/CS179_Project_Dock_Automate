@@ -23,7 +23,7 @@ class Log:
         # self.filepath = os.path.expanduser(f"~/Documents/.DockAutomate") # MacOS/Linux
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
-            os.system(f"attrib +h {self.filepath}")
+            # os.system(f"attrib +h {self.filepath}")
             self.debug_flags[0] = True
         self.jsonfile = self.filepath + "\.log_config.json"
 
@@ -58,7 +58,6 @@ class Log:
                 self.__update_json()
         else:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{self.year}.txt")
-        # self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{2023}.txt")
     
     """Search through ~\.DockAutomate directory for a valid Log file"""
     def __find_valid_files(self, filename:str):

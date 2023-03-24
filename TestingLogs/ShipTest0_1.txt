@@ -1,6 +1,7 @@
 ###############################################
 Ship Testing 0.1 - Testing Unload/Load
-- ShipTests.txt
+- Manifest: ShipCase1.txt
+- Test Log: ShipTest0_1.txt
 1. Unload Cat
 2. Load Elephant
 3. Unload Cat, Load Elephant

@@ -1,5 +1,7 @@
 #######################################
 Auxiliary Testing - All Functionalities
+- Manifest: emptyship.txt
+- Test Log: AuxTest.txt
 #######################################
 ============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers
 --------- Empty Ship

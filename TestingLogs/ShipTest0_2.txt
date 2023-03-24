@@ -1,7 +1,10 @@
 ###############################################
 Ship Testing 0.2 - Testing Balancing
-- ShipTests.txt
+- Manifest: ShipTest1.txt
+- Test Log: ShipTest0_2.txt
 1. Balance Original
+2. Balance Removing Cat From Original
+2. Balance Adding Elephant From Original
 ###############################################
 ============================== 1. Balance Original
 --------- Initial Ship
