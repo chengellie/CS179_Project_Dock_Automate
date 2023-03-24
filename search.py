@@ -113,7 +113,10 @@ def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]
         for j in range(problem.top_columns[i] + 1, problem.row):
             all_weights.append(problem.ship_state[j][i].weight)
 
-    if len(all_weights == 1):   # TODO: SIFT, just move this single container
+    if len(all_weights) == 0:
+        print("Already Balanced")
+        return problem
+    elif len(all_weights) == 1:   # TODO: SIFT, just move this single container
         print("Error: unsolvable ship")
         return None
     all_weights.sort(reverse=True)
@@ -169,6 +172,8 @@ def priority_lu_queueing(
     for child in children:
         if child != None and child.generate_ship_key() not in dups:
             total_cost = child.time_cost
+            if heuristic == "cntr-lu":
+                total_cost += problem.cntr_lu_heuristic
             nodes.put(PrioritizedShip(total_cost, child))
             print(
                 "Before: loc: ",
@@ -204,7 +209,10 @@ def priority_lu_queueing(
 
 def uniform_cost_lu(problem: Ship, heuristic: str = None) -> Optional[Ship]:
     nodes = PriorityQueue()
+    problem.set_cntr_lu_heuristic()
     total_cost = problem.time_cost
+    if heuristic == "cntr-lu":
+        total_cost += problem.cntr_lu_heuristic
     nodes.put(PrioritizedShip(total_cost, problem))
     dups = set()
     dups.add(problem.generate_ship_key())
