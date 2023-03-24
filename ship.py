@@ -1,6 +1,6 @@
 import copy
 from container import Container
-from typing import List, Optional
+from typing import List, Set, Optional
 
 # modify or remove get columns, unneeded. instead have search and find depth go rowwise instead. (search algo will mark matching containers. list stores them in depth order (will shift accordingly)
 
@@ -8,6 +8,8 @@ from typing import List, Optional
 class Ship:
     def __init__(self, ship_state: Optional[List[Container]] = []) -> None:
         self.ship_state = ship_state
+        self.loads = []
+        self.unloads = {}
         self.goal_state = {}
         self.row = 8
         self.col = 12
@@ -63,13 +65,17 @@ class Ship:
 
         self.__init_balance_mass()
 
-    def init_goal_state(self, loads: List[str], unloads: List[str]) -> None:
+    def init_goal_state(self, loads: List[str], unloads: Set[int]) -> None:
         """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
         for row in self.ship_state:
             for cntr in row:
                 cntr_name = cntr.name
                 if cntr_name == "UNUSED" or cntr_name == "NAN":
                     continue
+                # TODO: temporarily using selected to identify unloads
+                if cntr.selected == True:
+                    continue
+                # TODO: defaultdict?
                 if cntr_name in self.goal_state.keys():
                     self.goal_state[cntr_name] += 1
                 else:
@@ -82,14 +88,14 @@ class Ship:
             else:
                 self.goal_state[cntr_name] = 1
 
-        for cntr_name in unloads:
-            if cntr_name in self.goal_state.keys():
-                self.goal_state[cntr_name] -= 1
-                if self.goal_state[cntr_name] == 0:
-                    del self.goal_state[cntr_name]
-            else:
-                print("Error: trying to unload item that is not in ship")
-                return
+        # for cntr_name in unloads:
+        #     if cntr_name in self.goal_state.keys():
+        #         self.goal_state[cntr_name] -= 1
+        #         if self.goal_state[cntr_name] == 0:
+        #             del self.goal_state[cntr_name]
+        #     else:
+        #         print("Error: trying to unload item that is not in ship")
+        #         return
 
     def is_goal_state(self) -> bool:
         """Inputs None, Returns if current ship_state matches goal_state."""
@@ -99,7 +105,7 @@ class Ship:
                 cntr_name = cntr.name
                 if cntr_name == "UNUSED" or cntr_name == "NAN":
                     continue
-                if cntr_name in self.curr_state.keys():
+                if cntr_name in curr_state.keys():
                     curr_state[cntr_name] += 1
                 else:
                     curr_state[cntr_name] = 1
@@ -237,7 +243,9 @@ class Ship:
 
         # compute depth and choose this container if smaller depth (preferably choose one in higher point)
         for i, row in enumerate(self.cntrs_in_row):
-            if (cntr_name in row and orig_cntr.ship_coord not in row[cntr_name]):  # container exists in this row and isn't the original
+            if (
+                cntr_name in row and orig_cntr.ship_coord not in row[cntr_name]
+            ):  # container exists in this row and isn't the original
                 for pot_cntr_coord in row[cntr_name]:
                     pot_cntr = self.get_cntr(pot_cntr_coord)
                     pot_cntr_depth = self.get_container_depth(pot_cntr)
@@ -311,6 +319,10 @@ class Ship:
 
     def get_col_top_cntr_depth(self, col: int) -> int:
         """Inputs column. Returns row index of first container in ship_state or -1 if col is empty."""
+        # TODO: remove debug
+        if col == 12:
+            print("issue\n", self, self.crane_loc, col)
+
         i = 0
         while i < self.row and self.ship_state[i][col].name == "UNUSED":
             i += 1
@@ -404,10 +416,11 @@ class Ship:
 
         # max_height = self.row - min(self.top_columns[(left[1] + 1):(right[1] + 1)]) - 1
         max_height = left[0]
-        for j in range(left[1] + 1, right[1] + 1):
+        for j in range(left[1] + 1, right[1]):
             # TODO: is max_height fix ok?
             while max_height >= 0 and self.ship_state[max_height][j].name != "UNUSED":
                 max_height -= 1
+        max_height = min(max_height, right[0])
 
         # insert moves up
         for i in range(start_pos[0], max_height - 1, -1):
@@ -456,13 +469,21 @@ class Ship:
         self.moves.append([row_get, col_get])
         self.moves.append([row_put, col_put])
 
-    def time_from_pink_cell(self, col: int) -> int:
-        """Inputs column to move crane to. Returns cost of moving crane from pink cell to top container of col."""
-        row = self.get_col_top_cntr_depth(col)
-        if row == -1:
-            print("Error: cannot get from column", col)
-            return -1
-        return col + row + 1
+    def time_between_pink_cell(self, col: int, type: str) -> int:
+        """Inputs column to move crane to and whether cell contains a container.
+        Returns cost of moving crane from pink cell to top container of col.
+        """
+        if type == "cntr":
+            row = self.get_col_top_cntr_depth(col)
+            if row == -1:
+                print("Error: cannot get from column", col)
+                return -1
+        elif type == "empty":
+            row = self.get_col_top_empty_depth(col)
+            if row == -1:
+                print("Error: cannot put in column", col)
+                return -1
+        return col + row
 
     def time_between_col(self, start_col: int, end_col: int) -> int:
         """Inputs two columns. Returns cost of moving crane from top container of start col to top container of end col"""
@@ -488,45 +509,129 @@ class Ship:
         # update cost and moves
         return len(self.get_moves([start_row, start_col], [end_row, end_col])) - 1
 
+    def move_toward_loading_area(self, heuristic: str = None):
+        """Inputs heuristic. Returns new Ship object after move, None if move not valid."""
+        if self.crane_mode == "get":
+            new_crane_mode = "put"
+        elif self.crane_mode == "put" or self.crane_mode == None:
+            new_crane_mode = "get"
+        else:
+            print("Error: current crane_mode is not a valid option")
+            return None
+
+        if new_crane_mode == "get":
+            # check if there is nothing else to load
+            if not self.loads:
+                print("Error: no containers to load onto ship")
+                return None
+            else:
+                # cost from previous put to truck
+                new_ship = copy.deepcopy(self)
+                new_ship.crane_loc = self.col
+                new_ship.crane_mode = new_crane_mode
+                if self.crane_mode == None:
+                    new_ship.time_cost += 2
+                else:
+                    new_ship.time_cost += (
+                        new_ship.time_between_pink_cell(self.crane_loc, "cntr") + 2
+                    )
+        elif new_crane_mode == "put":
+            start_col = self.crane_loc
+            start_row = self.get_col_top_cntr_depth(start_col)
+            # check if current container needs to be unloaded
+            if self.ship_state[start_row][start_col].selected == True:
+                # cost from previous put to truck
+                new_ship = copy.deepcopy(self)
+                new_ship.crane_loc = self.col
+                new_ship.crane_mode = new_crane_mode
+                new_ship.time_cost += (
+                    new_ship.time_between_pink_cell(self.crane_loc, "cntr") + 2
+                )
+                new_ship.remove_cntr(self.crane_loc)
+            else:
+                print("Error: Container does not need to be unloaded")
+                return None
+
+        return new_ship
+
+    def move_away_loading_area(self, col: int, heuristic: str = None):
+        """Inputs column to move crane to and heuristic. Returns new Ship object after move, None if move not valid."""
+        if self.crane_mode == "get":
+            new_crane_mode = "put"
+        elif self.crane_mode == "put" or self.crane_mode == None:
+            new_crane_mode = "get"
+        else:
+            print("Error: current crane_mode is not a valid option")
+            return None
+
+        if new_crane_mode == "get":
+            # cost from truck to current get
+            new_ship = copy.deepcopy(self)
+            new_ship.crane_loc = col
+            new_ship.crane_mode = new_crane_mode
+            new_ship.time_cost += new_ship.time_between_pink_cell(col, "cntr") + 2
+        elif new_crane_mode == "put":
+            # cost from previous put to truck
+            new_ship = copy.deepcopy(self)
+            new_ship.crane_loc = col
+            new_ship.crane_mode = new_crane_mode
+            new_ship.time_cost += new_ship.time_between_pink_cell(col, "empty") + 2
+            new_ship.add_cntr(new_ship.loads.pop(), col)
+
+        return new_ship
+
+    # TODO: when unload is reached, unload can be placed on any of other ship cols or truck
     def move_crane(self, col: int, heuristic: str = None):
         """Inputs column to move crane to. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
         elif self.crane_mode == "put" or self.crane_mode == None:
             new_crane_mode = "get"
-            # self.crane_loc = -1
         else:
             print("Error: current crane_mode is not a valid option")
+            return None
 
         # check if crane is getting container from empty col or NAN col
-        if new_crane_mode == "get" and (
-            self.is_empty_col(col) or self.ship_state[0][col].name == "NAN"
+        if (
+            new_crane_mode == "get"
+            and col != self.col
+            and (self.is_empty_col(col) or self.ship_state[0][col].name == "NAN")
         ):
             return None
 
         # check if crane is putting container to full col or NAN col
-        if new_crane_mode == "put" and self.is_full_col(col):
+        if new_crane_mode == "put" and col != self.col and self.is_full_col(col):
             return None
 
         # check crane_loc is not being moved to same col as get
-        if new_crane_mode == "put" and col == self.crane_loc:
+        # if new_crane_mode == "put" and col == self.crane_loc:
+        if col == self.crane_loc:
             return None
 
-        # construct new ship with move performed
-        new_ship = copy.deepcopy(self)
-        new_ship.crane_loc = col
-        new_ship.crane_mode = new_crane_mode
+        # check if crane is in loading area
+        if col == self.col:
+            new_ship = self.move_toward_loading_area(heuristic)
+        elif self.crane_loc == self.col:
+            new_ship = self.move_away_loading_area(col, heuristic)
+        else:
+            # construct new ship with move performed
+            new_ship = copy.deepcopy(self)
+            new_ship.crane_loc = col
+            new_ship.crane_mode = new_crane_mode
 
-        # perform move if new_crane_mode is put
-        if new_crane_mode == "put":
-            new_ship.move_cntr(self.crane_loc, col)
-        elif new_crane_mode == "get":
-            if self.crane_mode == None:
-                new_ship.time_cost += new_ship.time_from_pink_cell(new_ship.crane_loc)
-            else:
-                new_ship.time_cost += new_ship.time_between_col(
-                    self.crane_loc, new_ship.crane_loc
-                )
+            # perform move if new_crane_mode is put
+            if new_crane_mode == "put":
+                new_ship.move_cntr(self.crane_loc, col)
+            elif new_crane_mode == "get":
+                if self.crane_mode == None:
+                    # TOOD: check functionality of code below
+                    new_ship.time_cost += new_ship.time_between_pink_cell(
+                        new_ship.crane_loc, "cntr"
+                    )
+                else:
+                    new_ship.time_cost += new_ship.time_between_col(
+                        self.crane_loc, new_ship.crane_loc
+                    )
 
         if heuristic == "cntr-cross":
             new_ship.set_cntr_cross_bal_heuristic()
