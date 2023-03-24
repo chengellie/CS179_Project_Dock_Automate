@@ -53,7 +53,7 @@ def unpack_actions(ship: Ship, op_filename: str, row: int, col: int):
 
             # loads.extend([actions['name'][i]]*int(actions['qty'][i]))
 
-    return loads, unloads
+    return loads, set(unloads)
 
 
 def setup_cntr(ship: Ship, cntr: list, selecting: bool = True) -> Container:
