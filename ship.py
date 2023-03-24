@@ -185,7 +185,7 @@ class Ship:
 
     def set_cntr_lu_heuristic(self) -> None:
         cnt = 0
-        for cntr in unloads:
+        for cntr in self.unloads:
             cnt += self.get_container_depth(cntr)
         self.cntr_lu_heuristic = cnt
     # def set_col_move_bal_heuristic(self) -> None:
