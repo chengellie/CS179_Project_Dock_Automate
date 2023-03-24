@@ -5,6 +5,8 @@ import copy
 import util
 import search
 import csv
+import os
+import shutil
 from container import Container
 from random import choices
 
@@ -17,12 +19,16 @@ test_log_file = open(test_log_file_path + "AuxTest.txt", 'w')
 test_log_file.write(
 """#######################################
 Auxiliary Testing - All Functionalities
+- Manifest: emptyship.txt
+- Test Log: AuxTest.txt
 #######################################
 """
 )
-# Loading a Manifest to Build Ship From Scratch and Adding Containers
 test_log_file.write("============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers\n")
 scratch_ship = util.create_ship(manifest)
+test_log_file.write("--------- Empty Ship\n")
+test_log_file.write(f"{scratch_ship}")
+
 
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 0)
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 1)
@@ -39,9 +45,9 @@ scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_s
 scratch_ship.add_cntr(Container([-1,-1], 50, "Cat", [scratch_ship.row, scratch_ship.col]), 5)
 scratch_ship.add_cntr(Container([-1,-1], 30, "Bird", [scratch_ship.row, scratch_ship.col]), 5)
 
+test_log_file.write("--------- Filled Ship\n")
 test_log_file.write(f"{scratch_ship}")
 
-# Remove a container
 test_log_file.write("============================== Remove 4 Containers From Col 4\n")
 for i in range(0, 4):
     rm_cntr = scratch_ship.remove_cntr(4)
@@ -49,7 +55,6 @@ for i in range(0, 4):
 
 test_log_file.write(f"{scratch_ship}")
 test_log_file.write(f"{scratch_ship.top_columns}")
-[test_log_file.write(f"{row}") for row in scratch_ship.cntrs_in_row]
 
 test_log_file.write("============================== Unpack Container Actions\n")
 loads, unloads = util.unpack_actions(scratch_ship, op_filename, scratch_ship.row, scratch_ship.col)
@@ -59,46 +64,77 @@ test_log_file.write("--------- Loads\n")
 [test_log_file.write(l.get_cntr_info() + "\n") for l in loads]
 
 test_log_file.write("============================== Find Best Containers for Unpacked Actions\n")
+test_log_file.write("--------- Old Containers\n")
+[test_log_file.write(cntr.get_cntr_info() + "\n") for cntr in unloads]
 unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unloads]
+test_log_file.write("--------- Best Containers\n")
 [test_log_file.write(cntr.get_cntr_info() + "\n") for cntr in unload_cntrs]
 
-test_log_file.write("============================== Initializing Log File\n")
+test_log_file.write("============================== Initializing Log File (Multi-Step)\n")
+shutil.rmtree("DockAutomate\\")
 log = Log()
 if not log.open_log_file():
-    log.create_log_file(2024)
+    log.create_log_file(2023)
 
-test_log_file.write("============================== Log Writing\n")
-log.writelog("Testing Log")
-log.writecomment("""
-Good
-Day
-Sir
-""")
+test_log_file.write("==================== Step 1/3: Directory Missing, Create It\n")
+num_passed = 0
+if log.debug_flags[0]:
+    test_log_file.write("- Missing Directory Detected\n")
+    num_passed += 1
+if os.path.exists(os.getcwd() + f"\DockAutomate"):
+    test_log_file.write("- Directory Successfully Created\n")
+    num_passed += 1
+test_log_file.write(f"------ Passed {num_passed}/2\n")
 
-test_log_file.write("============================== Restore Operations\n")
-log.writelog("Offload Cat")
-log.writelog("Onload Cat")
-print(log.open_log_file())
+test_log_file.write("==================== Step 2/3: Log Config Missing, Create It\n")
+num_passed = 0
+if log.debug_flags[1]:
+    test_log_file.write("- Missing Log Config Detected\n")
+    num_passed += 1
+if os.path.exists(os.getcwd() + f"\DockAutomate\.log_config.json"):
+    test_log_file.write("- Log Config Successfully Created\n")
+    num_passed += 1
+test_log_file.write(f"------ Passed {num_passed}/2\n")
 
-test_log_file.write("============================== Unload/Load Search\n")
+test_log_file.write("==================== Step 3/3: Log File Missing, Create It\n")
+num_passed = 0
+if log.debug_flags[2]:
+    test_log_file.write("- Missing Log File Detected\n")
+    num_passed += 1
+if os.path.exists(os.getcwd() + f"\DockAutomate\\activitylog2023.txt"):
+    test_log_file.write("- Log File Successfully Created\n")
+    num_passed += 1
+test_log_file.write(f"------ Passed {num_passed}/2\n")
 
-test_log_file.write("============================== Ship Balancing\n")
+test_log_file.write("============================== Log Writing (Multi-Step)\n")
+test_log_file.write("==================== Step 1/2: Write Actions To Log\n")
+num_passed = 0
+for i in range(0, 3):
+    if log.writelog(f"Container {i} Offloaded"):
+        test_log_file.write("Written Successfully, Check \DockAutomate\\activitylog2023.txt for Validity\n")
+        num_passed += 1
+test_log_file.write(f"------ Passed {num_passed}/3\n")
 
-
-test_log_file.close()
+test_log_file.write("==================== Step 2/2: Write Comments To Log\n")
+num_passed = 0
+for i in range(0, 3):
+    if log.writecomment(f"Container {i} is Broken"):
+        test_log_file.write("Written Successfully, Check \DockAutomate\\activitylog2023.txt for Validity\n")
+        num_passed += 1
+test_log_file.write(f"------ Passed {num_passed}/3\n")
 
 # ================================================================================================================
-
 test_log_file_path = "TestingLogs/"
 test_log_file = open(test_log_file_path + "ShipTest0_1.txt", 'w')
 test_log_file.write(
 """###############################################
 Ship Testing 0.1 - Testing Unload/Load
-- ShipTests.txt
+- Manifest: ShipCase1.txt
+- Test Log: ShipTest0_1.txt
 1. Unload Cat
 2. Load Elephant
 3. Unload Cat, Load Elephant
-4. Stress Test: Unload Cat and Dog, Load Elephant and Bird x2
+4. Stress Test: Unload Cat and Dog, Load Elephant
 ###############################################
 """
 )
@@ -112,19 +148,19 @@ with open(op_filename, mode = 'w', newline='') as csvfile:
     file_writer.writerow(['name','qty','type','coords','weight'])
     file_writer.writerow(['Cat',1,'Unload','7_1',99])
     
-ship = util.create_ship(manifest, op_filename)
+ship0_1_0 = util.create_ship(manifest, op_filename)
 test_log_file.write(f"--------- Initial Ship\n")
-test_log_file.write(f"{ship}")
+test_log_file.write(f"{ship0_1_0}")
 
 test_log_file.write(f"--------- Unloads\n")
-[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship.unloads]
+[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship0_1_0.unloads]
 test_log_file.write(f"--------- Loads\n")
-[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship.loads]
+[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship0_1_0.loads]
 
-sol_ship = search.uniform_cost_lu(ship)
+sol_ship0_1_0 = search.uniform_cost_lu(ship0_1_0)
 test_log_file.write(f"--------- Container Moves Start End\n")
-if sol_ship != None:
-    for i, move in enumerate(sol_ship.moves):
+if sol_ship0_1_0 != None:
+    for i, move in enumerate(sol_ship0_1_0.moves):
         test_output = f"{move}"
         if (i % 2 == 0):
             test_output += " "
@@ -133,7 +169,7 @@ if sol_ship != None:
         test_log_file.write(test_output)
 
 test_log_file.write(f"--------- Final Ship\n")
-test_log_file.write(f"{sol_ship}")
+test_log_file.write(f"{sol_ship0_1_0}")
 
 # ---------------------------------------------------------------------------------------
 test_log_file.write("============================== 2. Load Elephant\n")
@@ -142,19 +178,19 @@ with open(op_filename, mode = 'w', newline='') as csvfile:
     file_writer.writerow(['name','qty','type','coords','weight'])
     file_writer.writerow(['Elephant',1,'Load','N/A',250])
     
-ship = util.create_ship(manifest, op_filename)
+ship0_1_1 = util.create_ship(manifest, op_filename)
 test_log_file.write(f"--------- Initial Ship\n")
-test_log_file.write(f"{ship}")
+test_log_file.write(f"{ship0_1_1}")
 
 test_log_file.write(f"--------- Unloads\n")
-[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship.unloads]
+[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship0_1_1.unloads]
 test_log_file.write(f"--------- Loads\n")
-[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship.loads]
+[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship0_1_1.loads]
 
-sol_ship = search.uniform_cost_lu(ship)
+sol_ship0_1_1 = search.uniform_cost_lu(ship0_1_1)
 test_log_file.write(f"--------- Container Moves Start End\n")
-if sol_ship != None:
-    for i, move in enumerate(sol_ship.moves):
+if sol_ship0_1_1 != None:
+    for i, move in enumerate(sol_ship0_1_1.moves):
         test_output = f"{move}"
         if (i % 2 == 0):
             test_output += " "
@@ -163,7 +199,7 @@ if sol_ship != None:
         test_log_file.write(test_output)
 
 test_log_file.write(f"--------- Final Ship\n")
-test_log_file.write(f"{sol_ship}")
+test_log_file.write(f"{sol_ship0_1_1}")
 
 # ---------------------------------------------------------------------------------------
 test_log_file.write("============================== 3. Unload Cat, Load Elephant\n")
@@ -173,19 +209,19 @@ with open(op_filename, mode = 'w', newline='') as csvfile:
     file_writer.writerow(['Cat',1,'Unload','7_1',99])
     file_writer.writerow(['Elephant',1,'Load','N/A',250])
     
-ship = util.create_ship(manifest, op_filename)
+ship0_1_2 = util.create_ship(manifest, op_filename)
 test_log_file.write(f"--------- Initial Ship\n")
-test_log_file.write(f"{ship}")
+test_log_file.write(f"{ship0_1_2}")
 
 test_log_file.write(f"--------- Unloads\n")
-[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship.unloads]
+[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship0_1_2.unloads]
 test_log_file.write(f"--------- Loads\n")
-[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship.loads]
+[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship0_1_2.loads]
 
-sol_ship = search.uniform_cost_lu(ship)
+sol_ship0_1_2 = search.uniform_cost_lu(ship0_1_2)
 test_log_file.write(f"--------- Container Moves Start End\n")
-if sol_ship != None:
-    for i, move in enumerate(sol_ship.moves):
+if sol_ship0_1_2 != None:
+    for i, move in enumerate(sol_ship0_1_2.moves):
         test_output = f"{move}"
         if (i % 2 == 0):
             test_output += " "
@@ -194,77 +230,138 @@ if sol_ship != None:
         test_log_file.write(test_output)
     
 test_log_file.write(f"--------- Final Ship\n")
-test_log_file.write(f"{sol_ship}")
+test_log_file.write(f"{sol_ship0_1_2}")
 
 # ---------------------------------------------------------------------------------------
-test_log_file.write("============================== 4. Stress Test: Unload Cat and Dog, Load Elephant and Bird x2\n")
-with open(op_filename, mode = 'a', newline='') as csvfile:
-    file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    file_writer.writerow(['Dog',1,'Unload','7_2',100])
-    file_writer.writerow(['Bird',2,'Load','N/A',50])
+# test_log_file.write("============================== 4. Stress Test: Unload Cat and Dog, Load Elephant\n")
+# with open(op_filename, mode = 'a', newline='') as csvfile:
+#     file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+#     file_writer.writerow(['Dog',1,'Unload','7_2',100])
+#     file_writer.writerow(['Bird',2,'Load','N/A',50])
     
-ship = util.create_ship(manifest, op_filename)
-test_log_file.write(f"--------- Initial Ship\n")
-test_log_file.write(f"{ship}")
+# ship0_1_3 = util.create_ship(manifest, op_filename)
+# test_log_file.write(f"--------- Initial Ship\n")
+# test_log_file.write(f"{ship0_1_3}")
 
-test_log_file.write(f"--------- Unloads\n")
-[test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship.unloads]
-test_log_file.write(f"--------- Loads\n")
-[test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship.loads]
+# test_log_file.write(f"--------- Unloads\n")
+# [test_log_file.write(f"{u.get_cntr_info()}\n") for u in ship0_1_3.unloads]
+# test_log_file.write(f"--------- Loads\n")
+# [test_log_file.write(f"{l.get_cntr_info()}\n") for l in ship0_1_3.loads]
 
-sol_ship = search.uniform_cost_lu(ship)
-test_log_file.write(f"--------- Container Moves Start End\n")
-if sol_ship != None:
-    for i, move in enumerate(sol_ship.moves):
-        test_output = f"{move}"
-        if (i % 2 == 0):
-            test_output += " "
-        else:
-            test_output += "\n"
-        test_log_file.write(test_output)
+# sol_ship0_1_3 = search.uniform_cost_lu(ship0_1_3)
+# test_log_file.write(f"--------- Container Moves Start End\n")
+# if sol_ship0_1_3 != None:
+#     for i, move in enumerate(sol_ship0_1_3.moves):
+#         test_output = f"{move}"
+#         if (i % 2 == 0):
+#             test_output += " "
+#         else:
+#             test_output += "\n"
+#         test_log_file.write(test_output)
     
-test_log_file.write(f"--------- Final Ship\n")
-test_log_file.write(f"{sol_ship}")
+# test_log_file.write(f"--------- Final Ship\n")
+# test_log_file.write(f"{sol_ship0_1_3}")
 
 # ship = util.create_ship_balance(manifest, outbound)
 
+# ================================================================================================================
+test_log_file = open(test_log_file_path + "ShipTest0_2.txt", 'w')
+test_log_file.write(
+"""###############################################
+Ship Testing 0.2 - Testing Balancing
+- Manifest: ShipTest1.txt
+- Test Log: ShipTest0_2.txt
+1. Balance Original
+2. Balance Removing Cat From Original
+2. Balance Adding Elephant From Original
+###############################################
 """
-Test Suite 0.2 - shipcasetest2.txt
-Offload: [Cat]
-    -> Onload: [Bat]
-Offload: [Dog]
-Onload: [Bird, Bird]
-"""
+)   # TODO: 2, 3
+ship0_2_0 = util.create_ship(manifest)
 
-"""
-Test Suite 1 - ShipCase1.txt
-Offload: [Cat]
-    -> Onload: [Bat]
-Offload: [Dog]
-Onload: [Bird, Bird]
-"""
+test_log_file.write("============================== 1. Balance Original\n")
+test_log_file.write(f"--------- Initial Ship\n")
+test_log_file.write(f"{ship0_2_0}")
+sol_ship0_2_0 = search.uniform_cost_balance(ship0_2_0, "cntr-cross")
 
+test_log_file.write(f"--------- Container Moves Start End\n")
+if sol_ship0_2_0 != None:
+    for i, move in enumerate(sol_ship0_2_0.moves):
+        test_output = f"{move}"
+        if (i % 2 == 0):
+            test_output += " "
+        else:
+            test_output += "\n"
+        test_log_file.write(test_output)
+
+test_log_file.write(f"--------- Final Ship\n")
+test_log_file.write(f"{sol_ship0_2_0}")
+
+# ================================================================================================================
+test_log_file = open(test_log_file_path + "ShipTest1.txt", 'w')
+test_log_file.write(
+"""###############################################
+Ship Testing 1
+- ShipCase1.txt
+1. Balance Original
+2. Load Unload Containers
+3. Balance Resulting Ship
+###############################################
 """
-Test Suite 2 - ShipCase2.txt
-Offload: [Cat]
-    -> Onload: [Bat]
-Offload: [Dog]
-Onload: [Bird, Bird]
+)   # TODO: 2, 3
+manifest = "ShipCase/ShipCase1.txt"
+op_filename = "data/action_list.csv"
+ship1 = util.create_ship(manifest)
+
+test_log_file.write("============================== 1. Balance Original\n")
+test_log_file.write(f"--------- Initial Ship\n")
+test_log_file.write(f"{ship1}")
+sol_ship1 = search.uniform_cost_balance(ship1, "cntr-cross")
+
+test_log_file.write(f"--------- Container Moves Start End\n")
+if sol_ship1 != None:
+    for i, move in enumerate(sol_ship1.moves):
+        test_output = f"{move}"
+        if (i % 2 == 0):
+            test_output += " "
+        else:
+            test_output += "\n"
+        test_log_file.write(test_output)
+
+test_log_file.write(f"--------- Final Ship\n")
+test_log_file.write(f"{sol_ship1}")
+
+
+# ================================================================================================================
+test_log_file = open(test_log_file_path + "ShipTest2.txt", 'w')
+test_log_file.write(
+"""###############################################
+Ship Testing 2
+- ShipCase2.txt
+1. Balance Original
+2. Load Unload Containers
+3. Balance Resulting Ship
+###############################################
 """
+)   # TODO: 2, 3
+manifest = "ShipCase/ShipCase2.txt"
+op_filename = "data/action_list.csv"
+ship2 = util.create_ship(manifest)
 
-# new_cntr_coords = ship.add_cntr(ship.remove_cntr(5), 3)
+test_log_file.write("============================== 1. Balance Original\n")
+test_log_file.write(f"--------- Initial Ship\n")
+test_log_file.write(f"{ship2}")
+sol_ship2 = search.uniform_cost_balance(ship2, "cntr-cross")
 
-# Final Test: testing production level (Into Documents/data/...)
+test_log_file.write(f"--------- Container Moves Start End\n")
+if sol_ship2 != None:
+    for i, move in enumerate(sol_ship2.moves):
+        test_output = f"{move}"
+        if (i % 2 == 0):
+            test_output += " "
+        else:
+            test_output += "\n"
+        test_log_file.write(test_output)
 
-# s = shiputil.create_ship(
-#         "ShipCase/ShipCase1.txt",
-#         "load_unload.txt",
-#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-#     )
-# t = s.ship_state[7][1]
-# for i in range(0, 10):
-#     s.add_cntr(t, 1)
-# print(s)
-# print(s.top_columns)
-# s.remove_cntr(0)
-# print(s)
+test_log_file.write(f"--------- Final Ship\n")
+test_log_file.write(f"{sol_ship2}")

@@ -16,6 +16,7 @@ self.logfile = the log file name
 class Log:
     # Private Functions #
     def __init__(self):
+        self.debug_flags = [False, False, False]    # directory had to be created, log config had to be created, log file had to be created
         self.filepath = os.getcwd() + f"\DockAutomate"   # Testing  Windows
         # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
         # self.filepath = os.getcwd() + f"/.DockAutomate"   # Testing MacOS/Linux
@@ -23,6 +24,7 @@ class Log:
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
             os.system(f"attrib +h {self.filepath}")
+            self.debug_flags[0] = True
         self.jsonfile = self.filepath + "\.log_config.json"
 
         json_found, tmp_file = self.__find_valid_files(".log_config.json")
@@ -37,7 +39,8 @@ class Log:
                                             "new": True                                                  # lines for seeking to last line of log
                                         }, indent=4)
                 config_file.write(config_obj)
-            # os.system(f"attrib +h {self.jsonfile}")
+            self.debug_flags[1] = True
+            os.system(f"attrib +h {self.jsonfile}")
         
         # Read json
         with open(self.jsonfile, 'r') as config_file:
@@ -115,6 +118,7 @@ class Log:
             pass
         self.year = year
         self.__update_json()
+        self.debug_flags[2] = True
 
     def open_log_file(self) -> int:
         if not self.valid_log:  # no valid log files -> create a new one
