@@ -46,5 +46,3 @@ def setup_cntr(ship: Ship, cntr: list, selecting: bool = True) -> Container:
     selected_cntr.selected = selecting
 
     return selected_cntr
-
-# TODO: Make Unmark Container Function

@@ -122,7 +122,7 @@ test_log_file.write("============================== Remove 4 Containers From Col
 for i in range(0, 4):
     rm_cntr = scratch_ship.remove_cntr(4)
 
-    print(f"Removed {rm_cntr}")
+    test_log_file.write(f"Removed {rm_cntr}\n")
 
 print(scratch_ship)
 print(scratch_ship.top_columns)
@@ -149,18 +149,30 @@ test_log_file.write("--------- Unloads\n")
 [test_log_file.write(u.get_cntr_info() + "\n") for u in unloads]
 test_log_file.write("--------- Loads\n")
 [test_log_file.write(l.get_cntr_info() + "\n") for l in loads]
-print(unloads)
 
 test_log_file.write("============================== Find Best Containers for Unpacked Actions\n")
 # unload_cntrs = [util.setup_cntr(scratch_ship, cntr, True) for cntr in unloads]
 unload_cntrs = [scratch_ship.find_best_cntr(cntr) for cntr in unloads]
 [test_log_file.write(cntr.get_cntr_info() + "\n") for cntr in unload_cntrs]
 
+test_log_file.write("============================== Initializing Log File\n")
+log = Log()
+if not log.open_log_file():
+    log.create_log_file(2024)
+
 test_log_file.write("============================== Log Writing\n")
-log = Log("auxtestlog")
-# log.writelog("Testing Log")
-# log.writecomment("Good Day Sir")
-# log.readlog(printlog=True)
+log.writelog("Testing Log")
+log.writecomment("""
+Good
+Day
+Sir
+""")
+
+test_log_file.write("============================== Restore Operations\n")
+log.writelog("Offload Cat")
+log.writelog("Onload Cat")
+print(log.open_log_file())
+
 test_log_file.write("============================== Unload/Load Search\n")
 
 test_log_file.write("============================== Ship Balancing\n")
