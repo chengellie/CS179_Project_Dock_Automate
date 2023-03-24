@@ -113,8 +113,11 @@ def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]
         for j in range(problem.top_columns[i] + 1, problem.row):
             all_weights.append(problem.ship_state[j][i].weight)
 
+    if len(all_weights == 1):   # TODO: SIFT, just move this single container
+        print("Error: unsolvable ship")
+        return None
     all_weights.sort(reverse=True)
-    if all_weights[0] * 0.9 > sum(all_weights[1:]):
+    if all_weights[0] * 0.9 > sum(all_weights[1:]): # TODO SIFT, find optimal moves
         print("Error: unsolvable ship")
         return None
 
