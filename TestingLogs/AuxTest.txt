@@ -2,43 +2,43 @@
 Auxiliary Testing - All Functionalities
 #######################################
 ============================== Loading a Manifest to Build a Ship From Scratch by Adding Containers
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED Bird   UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Rat    UNUSED UNUSED UNUSED UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Cat    UNUSED UNUSED Elepha UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Dog    UNUSED UNUSED Emu    UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Cat    Cat    UNUSED Cat    Dog    Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
 ============================== Remove 4 Containers From Col 4
 Removed Dog   
 Removed None
 Removed None
 Removed None
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-UNUSED UNUSED UNUSED UNUSED UNUSED Bird   UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Rat    UNUSED UNUSED UNUSED UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Cat    UNUSED UNUSED Elepha UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Dog    UNUSED UNUSED Emu    UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-Cat    Cat    UNUSED Cat    UNUSED Cat    UNUSED UNUSED UNUSED UNUSED UNUSED UNUSED 
-[3, 6, 7, 4, 7, 2, 7, 7, 7, 7, 7, 7]{'UNUSED': [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [0, 11]]}{'UNUSED': [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8], [1, 9], [1, 10], [1, 11]]}{'UNUSED': [[2, 0], [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [2, 9], [2, 10], [2, 11]]}{'UNUSED': [[3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 6], [3, 7], [3, 8], [3, 9], [3, 10], [3, 11]], 'Bird': [[3, 5]]}{'UNUSED': [[4, 1], [4, 2], [4, 3], [4, 4], [4, 6], [4, 7], [4, 8], [4, 9], [4, 10], [4, 11]], 'Rat': [[4, 0]], 'Cat': [[4, 5]]}{'UNUSED': [[5, 1], [5, 2], [5, 4], [5, 6], [5, 7], [5, 8], [5, 9], [5, 10], [5, 11]], 'Cat': [[5, 0], [5, 5]], 'Elephant': [[5, 3]]}{'UNUSED': [[6, 1], [6, 2], [6, 4], [6, 6], [6, 7], [6, 8], [6, 9], [6, 10], [6, 11]], 'Dog': [[6, 0]], 'Emu': [[6, 3]], 'Cat': [[6, 5]]}{'UNUSED': [[7, 2], [7, 6], [7, 7], [7, 8], [7, 9], [7, 10], [7, 11], [7, 4]], 'Cat': [[7, 0], [7, 1], [7, 3], [7, 5]], 'Dog': []}============================== Unpack Container Actions
+============================== Unpack Container Actions
 --------- Unloads
-Name: Cat 
-MCoords: [1, 2] 
-SCoords: [7, 1] 
-Weight: 50
+Name: UNUSED 
+MCoords: [8, 5] 
+SCoords: [0, 4] 
+Weight: 0
+Name: UNUSED 
+MCoords: [7, 5] 
+SCoords: [1, 4] 
+Weight: 0
 --------- Loads
-Name: Elephant 
-MCoords: [9, 0] 
-SCoords: [-1, -1] 
-Weight: 250
+Name: Cookies 
+MCoords: [-1, -1] 
+SCoords: [9, -2] 
+Weight: 100.0
+Name: Chips 
+MCoords: [-1, -1] 
+SCoords: [9, -2] 
+Weight: 50.0
+Name: Chips 
+MCoords: [-1, -1] 
+SCoords: [9, -2] 
+Weight: 50.0
 ============================== Find Best Containers for Unpacked Actions
-Name: Cat 
-MCoords: [1, 2] 
-SCoords: [7, 1] 
-Weight: 50
+Name: UNUSED 
+MCoords: [8, 5] 
+SCoords: [0, 4] 
+Weight: 0
+Name: UNUSED 
+MCoords: [8, 3] 
+SCoords: [0, 2] 
+Weight: 0
 ============================== Initializing Log File
 ============================== Log Writing
 ============================== Restore Operations

@@ -65,7 +65,7 @@ class Ship:
 
         self.__init_balance_mass()
 
-    def init_goal_state(self) -> None:
+    def init_goal_state(self, loads: List[str], unloads: Set[int]) -> None:
         """Inputs None, constructs goal state dictionary with number of each type of container. Returns None."""
         for row in self.ship_state:
             for cntr in row:
@@ -82,8 +82,7 @@ class Ship:
                     self.goal_state[cntr_name] = 1
 
         # simulating ship state after all actions completed
-        for cntr in self.loads:
-            cntr_name = cntr.name
+        for cntr_name in loads:
             if cntr_name in self.goal_state.keys():
                 self.goal_state[cntr_name] += 1
             else:
@@ -266,7 +265,7 @@ class Ship:
     def get_cntr(self, coords):
         return self.ship_state[coords[0]][coords[1]]
 
-    def add_cntr(self, cntr: Container, col: int) -> List[int]:
+    def add_cntr(self, cntr: Container, col: int) -> None:
         if not cntr:
             # print("Add Failed: Empty Container")
             return
@@ -287,8 +286,6 @@ class Ship:
         if cntr.name not in self.cntrs_in_row[row]:
             self.cntrs_in_row[row][cntr.name] = []
         self.cntrs_in_row[row][cntr.name].append([row, col])
-
-        return [row, col]
 
     def remove_cntr(self, col: int) -> Container:
         row = self.top_columns[col] + 1
@@ -550,8 +547,7 @@ class Ship:
                 new_ship.time_cost += (
                     new_ship.time_between_pink_cell(self.crane_loc, "cntr") + 2
                 )
-                removed_cntr = new_ship.remove_cntr(self.crane_loc)
-                new_ship.moves.extend([removed_cntr.ship_coord,[-1, -1]])
+                new_ship.remove_cntr(self.crane_loc)
             else:
                 print("Error: Container does not need to be unloaded")
                 return None
@@ -580,9 +576,7 @@ class Ship:
             new_ship.crane_loc = col
             new_ship.crane_mode = new_crane_mode
             new_ship.time_cost += new_ship.time_between_pink_cell(col, "empty") + 2
-            new_cntr_coord = new_ship.add_cntr(new_ship.loads.pop(), col)
-
-            new_ship.moves.extend([[-1, -1], new_cntr_coord])
+            new_ship.add_cntr(new_ship.loads.pop(), col)
 
         return new_ship
 

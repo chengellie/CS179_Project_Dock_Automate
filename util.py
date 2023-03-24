@@ -12,42 +12,26 @@ class PrioritizedShip:
 
 
 def create_ship(
-    manifest_filename: str, op_filename: str=""
+    manifest_filename: str, op_filename: str, outbound_filename: str
 ) -> Ship:
     """Input filename of manifest, parses file contents. Returns ship object."""
     # https://www.pythontutorial.net/python-basics/python-read-text-file/
     with open(manifest_filename) as f:
         manifest_cntnt = [line for line in f.readlines()]
+    with open(op_filename) as f:
+        loads = f.readline().strip().split(",")
+        unloads = f.readline().strip().split(",")
 
     ship = Ship()
     ship.init_ship_state_manifest(manifest_cntnt)
 
-    if op_filename != "":
-        ship.loads, ship.unloads = unpack_actions(ship, op_filename, ship.row, ship.col)
-        ship.unloads = [ship.find_best_cntr(cntr) for cntr in ship.unloads]
-
-        ship.init_goal_state()
+    cntr1 = Container([0, 0], 5, "Cat", [ship.row, ship.col])
+    cntr2 = Container([0, 0], 10, "Cat", [ship.row, ship.col])
+    loads = []
+    ship.ship_state[7][1].selected = True
+    ship.init_goal_state(loads, {})
 
     return ship
-
-# def create_ship_lu(
-#     manifest_filename: str, op_filename: str, outbound_filename: str
-# ) -> Ship:
-#     """Input filename of manifest, parses file contents. Returns ship object."""
-#     # https://www.pythontutorial.net/python-basics/python-read-text-file/
-#     with open(manifest_filename) as f:
-#         manifest_cntnt = [line for line in f.readlines()]
-#     # with open(op_filename) as f:
-#     #     loads = f.readline().strip().split(",")
-#     #     unloads = f.readline().strip().split(",")
-
-#     ship = Ship()
-#     ship.init_ship_state_manifest(manifest_cntnt)
-
-
-#     ship.init_goal_state()
-
-#     return ship
 
 
 def unpack_actions(ship: Ship, op_filename: str, row: int, col: int):
@@ -61,9 +45,11 @@ def unpack_actions(ship: Ship, op_filename: str, row: int, col: int):
             )
         else:
             for j in range(0, int(actions["qty"][i])):
-                new_cntr = Container([-1, -1], actions["weight"][i], actions["name"][i], [row, col])
-                new_cntr.set_ship_coord([-1, -1])
-                loads.append(new_cntr)
+                loads.append(
+                    Container(
+                        [-1, -1], actions["weight"][i], actions["name"][i], [row, col]
+                    )
+                )
 
             # loads.extend([actions['name'][i]]*int(actions['qty'][i]))
 

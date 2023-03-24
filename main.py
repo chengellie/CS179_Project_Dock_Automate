@@ -36,7 +36,7 @@ def load_unload_ship(ship: Ship):
 
 
 if __name__ == "__main__":
-    ship = create_ship_balance(
+    ship = create_ship(
         "ShipCase/ShipCase1.txt",
         "load_unload.txt",
         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
