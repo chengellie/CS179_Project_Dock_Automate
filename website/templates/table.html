@@ -35,6 +35,16 @@
     </div>
 </div>
 
+<br>
+
+<div class="w3-container w3-center">
+    <table style="width:100%">
+        <tr>
+            <td id="move_container" style="background-color:red;color:white;border: white;">Move Container:</td>
+        </tr>
+    </table>
+</div>
+
 <div class="w3-half">
     <br><br>
     <a class="w3-button w3-theme" href="/notes" target="_blank">Enter Note</a>
@@ -52,8 +62,12 @@
     var moves;
 
     async function manage(){
+        var containter_name = "#move_container";
         if(moves_list.length > 0){
             moves = moves_list.shift();
+            var id_container = moves[0];
+            var text = $(id_container).text();
+            $(containter_name).text("Move Container: " + text);
             if(moves[moves.length-1] == "remove"){
                 remove();
             }
@@ -61,7 +75,11 @@
                 swap();
             }
         }
-        else{console.log("Done!");}      
+        else{
+        console.log("Done!");
+        $(containter_name).text("All Steps Are Complete!");
+        $(containter_name).css('background-color', 'green');
+        }      
     }   
     
     async function remove(){
@@ -101,7 +119,7 @@
 
             if(loop_flag == "loop" || loop_flag == "keep_loop"){
                 id_start = moves[0];
-                await timer(1000);
+                await timer(500);
                 $(id_start).text(text_start);
                 $(id_start).css('background-color', 'red');
                 $(id_start).css('color', 'white');

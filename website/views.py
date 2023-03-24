@@ -15,7 +15,20 @@ notes = Blueprint('notes',__name__)
 
 current_user = ''
 current_ship = ''
+moves = []
+ship = ''
 
+def to_html_elememts(moves):
+    for j in range(len(moves)):
+            first = True
+            for i, ls in enumerate(moves[j]):
+                if first and ls[0] < 0:
+                    moves[j][i] = "add"
+                elif ls[0] < 0:
+                    moves[j][i] = "remove"
+                else:
+                    moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
+                first = False
 
 # def create_ship(manifest_filename, op_filename):
 #     """Input filename of manifest, parses file contents. Returns ship object."""
@@ -34,6 +47,12 @@ current_ship = ''
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
+    global ship
+    ship = create_ship(
+        "ShipCase/ShipCase4.txt",
+        "load_unload.txt",
+        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
+    )
     csvfile = open("data/action_list.csv", "w")
     csvfile.truncate()
     csvfile.close()
@@ -50,6 +69,23 @@ def home():
 
 @selection_1.route("/", methods = ['GET','POST'])
 def selection1():
+    global moves
+    global ship
+    moves = []
+    if request.method == 'POST':
+        if request.form['submit_button'] == 'load_unload':
+            moves.append([[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]])
+            moves.append(ship.get_moves([1, 4], [6, 6]))
+            print("load/unload selected")
+        elif request.form['submit_button'] == 'balance':
+            moves.append(ship.get_moves([0, 4], [6, 6]))
+            # moves = [[[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]]]
+            moves.append(ship.get_moves([1, 4], [5, 6]))
+            print("balance selected")
+        
+        to_html_elememts(moves)
+        return redirect('/table')
+
     global current_user
     csvfile = open('data/action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
@@ -60,6 +96,7 @@ def selection1():
 @unloading.route("/", methods = ['GET','POST'])
 def unload():
     global current_user
+    global ship
     ship = create_ship(
         "ShipCase/ShipCase4.txt",
         "load_unload.txt",
@@ -84,7 +121,7 @@ def unload():
 @loading.route("/", methods = ['GET','POST'])
 def load():
     global current_user
-
+    global ship
     if request.method == 'POST':
         load_name = request.form.get('item_name')
         load_weight = request.form.get('item_weight')
@@ -103,31 +140,12 @@ def load():
 @tables.route("/", methods = ['GET','POST'])
 def table():
     global current_user
-    ship = create_ship(
-        "ShipCase/ShipCase4.txt",
-        "load_unload.txt",
-        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-    )
+    global moves
+    global ship
     item = ship.ship_state
     row = len(item)
     col = len(item[0])
-    color = ["rgb(44, 174, 214)", "red"]
-    moves = []
-    moves.append(ship.get_moves([0, 4], [6, 6]))
-    # moves = [[[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]]]
-    moves.append(ship.get_moves([1, 4], [5, 6]))
-    print(moves)
-    for j in range(len(moves)):
-        first = True
-        for i, ls in enumerate(moves[j]):
-            if first and ls[0] < 0:
-                moves[j][i] = "add"
-            elif ls[0] < 0:
-                moves[j][i] = "remove"
-            else:
-                moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
-            first = False
-    # moves = ["ship_7_1", "ship_6_1", "ship_5_1"]
+    color = ["rgb(44, 174, 214)", "red"] 
     print(moves)
     return render_template(
         "table.html",
