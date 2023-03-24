@@ -114,10 +114,19 @@ def table():
     color = ["rgb(44, 174, 214)", "red"]
     moves = []
     moves.append(ship.get_moves([0, 4], [6, 6]))
+    # moves = [[[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]]]
     moves.append(ship.get_moves([1, 4], [5, 6]))
+    print(moves)
     for j in range(len(moves)):
+        first = True
         for i, ls in enumerate(moves[j]):
-            moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
+            if first and ls[0] < 0:
+                moves[j][i] = "add"
+            elif ls[0] < 0:
+                moves[j][i] = "remove"
+            else:
+                moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
+            first = False
     # moves = ["ship_7_1", "ship_6_1", "ship_5_1"]
     print(moves)
     return render_template(

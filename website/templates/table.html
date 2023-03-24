@@ -49,10 +49,73 @@
     var moves_list = {{ moves|tojson }};
     var space_flag = true;
     var loop_flag = "loop";
+    var moves;
+
+    async function manage(){
+        if(moves_list.length > 0){
+            moves = moves_list.shift();
+            if(moves[moves.length-1] == "remove"){
+                remove();
+            }
+            else{
+                swap();
+            }
+        }
+        else{console.log("Done!");}      
+    }   
+    
+    async function remove(){
+        var id_start;
+        var id_end;
+        console.log("Hellos");
+        while(true){
+            for (var i = 0; i + 1 < moves.length; i++) {
+                console.log(moves[i]);
+                id_start = moves[i];
+                id_end = moves[i+1];
+                if(id_end == "remove"){
+                    console.log("Removed");
+                    break;
+                }
+                var text_start = $(id_start).text();
+                var text_end = $(id_end).text();
+                var color_start = $(id_start).css( "color" );
+                var color_end = $(id_end).css( "color" );
+                $(id_end).text(text_start);
+                $(id_end).css('background-color', 'red');
+                $(id_end).css('color', color_start);
+                $(id_start).text(text_end);
+                $(id_start).css('background-color', color_end);
+                $(id_start).css('color', color_end);
+
+                await timer(500); // then the created Promise can be awaited
+            }
+
+            $(id_start).text("UNUSED");
+            $(id_start).css('background-color', 'white');
+            $(id_start).css('color', 'white');
+
+            if(loop_flag == "stop_loop"){
+                break;
+            }
+
+            if(loop_flag == "loop" || loop_flag == "keep_loop"){
+                id_start = moves[0];
+                await timer(1000);
+                $(id_start).text(text_start);
+                $(id_start).css('background-color', 'red');
+                $(id_start).css('color', 'white');
+                loop_flag = "keep_loop";
+                await timer(500); // then the created Promise can be awaited
+            }
+
+        }
+        loop_flag = "loop";
+        manage();
+    }
 
     async function swap() { // We need to wrap the loop into an async function for this to work
         // var moves = {{ moves|tojson }};
-        var moves = moves_list.shift();
         var id_start;
         var id_end;
         while(true){
@@ -98,7 +161,7 @@
             }
         }
         loop_flag = "loop";
-        swap();
+        manage();
 
     }
 
@@ -109,15 +172,13 @@
     document.body.onkeydown = function(e){
         if(e.keyCode == 32 && space_flag){
             space_flag = false; 
-            swap();
+            manage();
         }
         if(e.keyCode == 32 && loop_flag == "keep_loop"){
             loop_flag = "stop_loop";
         }
     }
     
-    
-
 
 </script>
 {% endblock %}
