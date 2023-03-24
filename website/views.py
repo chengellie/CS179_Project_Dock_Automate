@@ -2,8 +2,10 @@ from flask import Blueprint, render_template, json, request, redirect
 import csv
 from ship import Ship
 from util import *
+from search import *
 import os
 import sys
+import copy
 
 
 home_page = Blueprint("home_page", __name__)
@@ -17,6 +19,15 @@ current_user = ''
 current_ship = ''
 moves = []
 ship = ''
+item = ''
+
+def refresh_ship():
+    global ship
+    global item
+    ship = create_ship(
+        "ShipCase/ShipCase3.txt",
+    )
+    item = copy.deepcopy(ship.ship_state)
 
 def to_html_elememts(moves):
     for j in range(len(moves)):
@@ -30,29 +41,25 @@ def to_html_elememts(moves):
                     moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
                 first = False
 
-# def create_ship(manifest_filename, op_filename):
-#     """Input filename of manifest, parses file contents. Returns ship object."""
-#     # https://www.pythontutorial.net/python-basics/python-read-text-file/
-#     with open(manifest_filename) as f:
-#         manifest_cntnt = [line for line in f.readlines()]
-#     with open(op_filename) as f:
-#         loads = f.readline().strip().split(",")
-#         unloads = f.readline().strip().split(",")
-#     ret = create_ship(
-#         "ShipCase/ShipCase4.txt",
-#         "load_unload.txt",
-#         "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-#     )
-#     return ret
+def build_moves(path):
+    global moves
+    i=0
+    while i < len(path):
+        start = path[i]
+        print(start)
+        end = path[i+1]
+        print(end)
+        moves.append(ship.get_moves(start,end))
+        ship.add_cntr(ship.remove_cntr(start[1]), end[1])
+        i+=2
+        
+    
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
     global ship
-    ship = create_ship(
-        "ShipCase/ShipCase4.txt",
-        "load_unload.txt",
-        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-    )
+    global item
+    refresh_ship()
     csvfile = open("data/action_list.csv", "w")
     csvfile.truncate()
     csvfile.close()
@@ -71,16 +78,24 @@ def home():
 def selection1():
     global moves
     global ship
+    global item
+    refresh_ship()
     moves = []
     if request.method == 'POST':
         if request.form['submit_button'] == 'load_unload':
             moves.append([[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]])
             moves.append(ship.get_moves([1, 4], [6, 6]))
             print("load/unload selected")
+
         elif request.form['submit_button'] == 'balance':
-            moves.append(ship.get_moves([0, 4], [6, 6]))
+            # moves.append(ship.get_moves([0, 4], [6, 6]))
             # moves = [[[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]]]
-            moves.append(ship.get_moves([1, 4], [5, 6]))
+            # moves.append(ship.get_moves([1, 4], [5, 6]))
+            solution = uniform_cost_balance(ship,"cntr-cross")
+            path = solution.moves
+            print(path)
+            build_moves(path)
+
             print("balance selected")
         
         to_html_elememts(moves)
@@ -97,12 +112,7 @@ def selection1():
 def unload():
     global current_user
     global ship
-    ship = create_ship(
-        "ShipCase/ShipCase4.txt",
-        "load_unload.txt",
-        "OUTBOUNDShipCase/OUTBOUNDshipcasetest.txt",
-    )
-    item = ship.ship_state
+    global item
     if request.method == 'POST':
         unload = request.form.getlist('unload')
         with open('data/action_list.csv', mode = 'a',newline='') as csvfile:
@@ -142,7 +152,8 @@ def table():
     global current_user
     global moves
     global ship
-    item = ship.ship_state
+    global item
+    # item = ship.ship_state
     row = len(item)
     col = len(item[0])
     color = ["rgb(44, 174, 214)", "red"] 
