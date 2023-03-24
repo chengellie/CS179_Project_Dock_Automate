@@ -157,35 +157,35 @@ def priority_lu_queueing(
         if child != None and child.generate_ship_key() not in dups:
             total_cost = child.time_cost
             nodes.put(PrioritizedShip(total_cost, child))
-            # print(
-            #     "Before: loc: ",
-            #     node.crane_loc,
-            #     ", mode: ",
-            #     node.crane_mode,
-            #     ", cost: ",
-            #     node.time_cost,
-            #     ", heuristic: ",
-            #     node.cntr_cross_bal_heuristic,
-            #     sep="",
-            # )
-            # print(
-            #     "After: loc: ",
-            #     child.crane_loc,
-            #     ", mode: ",
-            #     child.crane_mode,
-            #     ", cost: ",
-            #     child.time_cost,
-            #     ", heuristic: ",
-            #     child.cntr_cross_bal_heuristic,
-            #     sep="",
-            # )
-            # print(
-            #     "total:",
-            #     total_cost,
-            #     "\nkey:",
-            #     child.generate_ship_key(),
-            # )
-            # print(child)
+            print(
+                "Before: loc: ",
+                node.crane_loc,
+                ", mode: ",
+                node.crane_mode,
+                ", cost: ",
+                node.time_cost,
+                ", heuristic: ",
+                node.cntr_cross_bal_heuristic,
+                sep="",
+            )
+            print(
+                "After: loc: ",
+                child.crane_loc,
+                ", mode: ",
+                child.crane_mode,
+                ", cost: ",
+                child.time_cost,
+                ", heuristic: ",
+                child.cntr_cross_bal_heuristic,
+                sep="",
+            )
+            print(
+                "total:",
+                total_cost,
+                "\nkey:",
+                child.generate_ship_key(),
+            )
+            print(child)
             dups.add(child.generate_ship_key())
 
 

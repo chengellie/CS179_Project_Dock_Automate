@@ -37,7 +37,7 @@ class Log:
                                             "new": True                                                  # lines for seeking to last line of log
                                         }, indent=4)
                 config_file.write(config_obj)
-            os.system(f"attrib +h {self.jsonfile}")
+            # os.system(f"attrib +h {self.jsonfile}")
         
         # Read json
         with open(self.jsonfile, 'r') as config_file:
