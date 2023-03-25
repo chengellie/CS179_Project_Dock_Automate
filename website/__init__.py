@@ -13,7 +13,7 @@ def create_app():
     app.register_blueprint(loading, url_prefix = '/load')
     app.register_blueprint(notes, url_prefix = '/notes')
     app.register_blueprint(logs, url_prefix = '/log')
-    app.register_blueprint(select_log, url_prefix = '/log')
+    app.register_blueprint(select_log, url_prefix = '/log_select')
     
 
     return app

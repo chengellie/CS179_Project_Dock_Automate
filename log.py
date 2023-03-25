@@ -23,7 +23,6 @@ class Log:
         # self.filepath = os.path.expanduser(f"~/Documents/DockAutomate") # MacOS/Linux
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
-            # os.system(f"attrib +h {self.filepath}")
             self.debug_flags[0] = True
         self.jsonfile = self.filepath + "\.log_config.json"
 
@@ -40,7 +39,7 @@ class Log:
                                         }, indent=4)
                 config_file.write(config_obj)
             self.debug_flags[1] = True
-            # os.system(f"attrib +h {self.jsonfile}")
+            os.system(f"attrib +h {self.jsonfile}")
         
         # Read json
         with open(self.jsonfile, 'r') as config_file:
