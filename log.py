@@ -40,7 +40,7 @@ class Log:
                                         }, indent=4)
                 config_file.write(config_obj)
             self.debug_flags[1] = True
-            os.system(f"attrib +h {self.jsonfile}")
+            # os.system(f"attrib +h {self.jsonfile}")
         
         # Read json
         with open(self.jsonfile, 'r') as config_file:

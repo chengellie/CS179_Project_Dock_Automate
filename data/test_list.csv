@@ -1,0 +1,5 @@
+name,qty,type,coords,weight
+Nat,1,Load,7_1,153
+Rat,1,Load,7_1,2321
+Hen,1,Unload,7_4,4
+Pig,1,Unload,7_3,4
