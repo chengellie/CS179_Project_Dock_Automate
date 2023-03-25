@@ -3,6 +3,7 @@ import csv
 from ship import Ship
 from util import *
 from search import *
+from container import Container
 import os
 import sys
 import copy
@@ -31,6 +32,7 @@ def refresh_ship():
     item = copy.deepcopy(ship.ship_state)
 
 def to_html_elememts(moves):
+    load_list = [i.name for i in ship.loads]
     try:
         for j in range(len(moves)):
                 first = True
@@ -53,6 +55,7 @@ def build_moves(path):
         end = path[i+1]
         if start[0] < 0:
             start[1] = end[1]
+            # temp_container = Container()
             # ship.add_cntr('TEMP', end[1])
         elif end[0] < 0:
             end[1] = start[1]
@@ -74,6 +77,12 @@ def build_moves(path):
 def home():
     global ship
     global item
+    global current_user
+
+    if current_user != '':
+        # user logged out
+        pass
+
     refresh_ship()
     csvfile = open("data/action_list.csv", "w")
     csvfile.truncate()
@@ -82,10 +91,9 @@ def home():
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow(['name','qty','type','coords','weight'])
 
-    global current_user
     if request.method == 'POST':
-        global current_user
         current_user = request.form.get('current_user')
+        # user logged in
         return redirect('/home-selection')
     return render_template("home.html",user = current_user)
 
@@ -193,5 +201,6 @@ def note():
     global current_user
     if request.method == 'POST':
         user_note = request.form.get('user_note')
+        # user added note
         print(user_note)
     return render_template("notes.html",user = current_user)

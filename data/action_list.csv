@@ -1,8 +1,1 @@
 name,qty,type,coords,weight
-<<<<<<< HEAD
-Snake,1,Load,N/A,100
-Owl   ,1,Unload,2_4,N/A
-=======
-Cow,1,Unload,7_1,500
-Rat,1,Load,N/A,5397
->>>>>>> cd3b2004ceb4805f17e1b700ff259522a72257cb

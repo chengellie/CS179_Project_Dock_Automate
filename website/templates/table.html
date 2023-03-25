@@ -51,6 +51,8 @@
     <br><br>
 </div>
  
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+
 
 <script>
 
@@ -61,6 +63,13 @@
     var space_flag = true;
     var loop_flag = "loop";
     var moves;
+
+    function log(){
+        $.ajax({
+            url: "models.py",
+             context: document.body
+            })
+        }
 
     async function manage(){
         var containter_name = "#move_container";
@@ -137,6 +146,7 @@
             }
         }
         loop_flag = "loop";
+        log();
         manage();
     }
     
@@ -189,6 +199,7 @@
 
         }
         loop_flag = "loop";
+        log();
         manage();
     }
 
