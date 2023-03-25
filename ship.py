@@ -143,6 +143,8 @@ class Ship:
             for cntr in row:
                 ret += cntr.name
         ret += str(self.crane_loc)
+        if self.crane_loc == self.col:
+            ret += self.crane_mode
         return ret
 
     def get_left_right_mass(self) -> int:
@@ -188,6 +190,7 @@ class Ship:
         for cntr in self.unloads:
             cnt += self.get_container_depth(cntr)
         self.cntr_lu_heuristic = cnt
+
     # def set_col_move_bal_heuristic(self) -> None:
     #     """Inputs None, computes heuristic for balance. Returns None.
     #     h(n) = minimum number of columns to move the minimum number of containers across mid-line to achieve balanced ship
@@ -450,25 +453,28 @@ class Ship:
             coord.append([i, end_pos[1]])
         return coord
 
-    def move_cntr(self, col_get: int, col_put: int) -> None:
+    def move_cntr(self, col_get: int, col_put: int) -> bool:
         """Inputs column to get container from and move container to. Returns None."""
         # return if moving container from and to same col
         if col_get == col_put:
             print("Error: Container is not being moved")
-            return
+            return False
 
         row_get = self.get_col_top_cntr_depth(col_get)
         # row_get = self.top_columns[col_get] + 1
         # if row_get == self.row or self.ship_state[row_get][col_get].name == "NAN":
         if row_get == -1:
             print("Error: No container to get in column", col_get)
-            return
+            return False
+        elif self.ship_state[row_get][col_get].selected == True:
+            print("Picking Up Desired Container")
+            return False
 
         row_put = self.get_col_top_empty_depth(col_put)
         # row_put = self.top_columns[col_put]
         if row_put == -1:
             print("Error: Cannot put container in this column, column is full.")
-            return
+            return False
         # update cost and moves
         self.time_cost += (
             len(self.get_moves([row_put, col_put], [row_get, col_get])) - 1
@@ -477,6 +483,8 @@ class Ship:
         # self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
         self.moves.append([row_get, col_get])
         self.moves.append([row_put, col_put])
+
+        return True
 
     def time_between_pink_cell(self, col: int, type: str) -> int:
         """Inputs column to move crane to and whether cell contains a container.
@@ -518,7 +526,7 @@ class Ship:
         # update cost and moves
         return len(self.get_moves([start_row, start_col], [end_row, end_col])) - 1
 
-    def move_toward_loading_area(self, heuristic: str = None):
+    def move_toward_loading_area(self):
         """Inputs heuristic. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
@@ -557,14 +565,18 @@ class Ship:
                     new_ship.time_between_pink_cell(self.crane_loc, "cntr") + 2
                 )
                 removed_cntr = new_ship.remove_cntr(self.crane_loc)
-                new_ship.moves.extend([removed_cntr.ship_coord,[-1, -1]])
+                new_ship.moves.extend([removed_cntr.ship_coord, [-1, -1]])
+
+                if removed_cntr in new_ship.unloads:
+                    print(f"Removing {removed_cntr.name}")
+                    new_ship.unloads.remove(removed_cntr)
             else:
                 print("Error: Container does not need to be unloaded")
                 return None
 
         return new_ship
 
-    def move_away_loading_area(self, col: int, heuristic: str = None):
+    def move_away_loading_area(self, col: int):
         """Inputs column to move crane to and heuristic. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
@@ -589,6 +601,20 @@ class Ship:
             new_cntr_coord = new_ship.add_cntr(new_ship.loads.pop(), col)
 
             new_ship.moves.extend([[-1, -1], new_cntr_coord])
+
+        return new_ship
+
+    def load_unload_loading_area(self):
+        """Inputs None. Returns new Ship object after move, None if move not valid."""
+        # check if there is nothing else to load
+        if not self.loads:
+            print("Error: no containers to load onto ship")
+            return None
+        else:
+            # cost from previous put to truck
+            new_ship = copy.deepcopy(self)
+            new_ship.crane_loc = self.col
+            new_ship.crane_mode = "get"
 
         return new_ship
 
@@ -621,10 +647,12 @@ class Ship:
             return None
 
         # check if crane is in loading area
-        if col == self.col:
-            new_ship = self.move_toward_loading_area(heuristic)
+        if col == self.col and self.crane_loc == self.col and new_crane_mode == "get":
+            new_ship = self.load_unload_loading_area()
+        elif col == self.col:
+            new_ship = self.move_toward_loading_area()
         elif self.crane_loc == self.col:
-            new_ship = self.move_away_loading_area(col, heuristic)
+            new_ship = self.move_away_loading_area(col)
         else:
             # construct new ship with move performed
             new_ship = copy.deepcopy(self)
@@ -633,7 +661,8 @@ class Ship:
 
             # perform move if new_crane_mode is put
             if new_crane_mode == "put":
-                new_ship.move_cntr(self.crane_loc, col)
+                if new_ship.move_cntr(self.crane_loc, col) == False:
+                    return
             elif new_crane_mode == "get":
                 if self.crane_mode == None:
                     # TOOD: check functionality of code below
@@ -645,7 +674,11 @@ class Ship:
                         self.crane_loc, new_ship.crane_loc
                     )
 
-        if heuristic == "cntr-cross":
+        if new_ship is None:
+            return None
+        elif heuristic == "cntr-cross":
             new_ship.set_cntr_cross_bal_heuristic()
+        elif heuristic == "cntr-lu":
+            new_ship.set_cntr_lu_heuristic()
         # TODO: if goal_state is reached, still need to move crane back to pink cell and include that in search
         return new_ship
