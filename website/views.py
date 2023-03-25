@@ -22,7 +22,18 @@ select_log = Blueprint('select_log',__name__)
 log = Log()
 log_opened = False
 manifest = ""
-filepath = os.getcwd() + f"/DockAutomate/manifest"   # Testing  Windows
+DA_filepath = os.path.expanduser(f"~\Documents\DockAutomate")
+filepath = DA_filepath + "\manifest"
+datapath = DA_filepath + "\data"
+if not os.path.exists(filepath):
+    os.mkdir(filepath)
+if not os.path.exists(datapath):
+    os.mkdir(datapath)
+if not os.path.exists(f"{datapath}\\action_list.csv"):
+    with open(f'{datapath}\\action_list.csv', mode = 'w', newline='') as csvfile:
+        file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        file_writer.writerow(['name','qty','type','coords','weight'])
+    
 
 current_user = ''
 current_ship = ''
@@ -36,17 +47,18 @@ def refresh_ship():
     global log
     global manifest
     global filepath
+    global datapath
     
-    # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
+    manifest_path = "ShipCase\emptyship.txt"
     for x in os.listdir(filepath):
         print(x)
         if x.endswith(".txt"):
-            manifest_path = filepath + f"/{x}"
+            manifest_path = filepath + f"\{x}"
             manifest = x
             break
     ship = create_ship(
         manifest_path,
-        "data/action_list.csv"
+        f"{datapath}\\action_list.csv"
     )
     
     item = copy.deepcopy(ship.ship_state)
@@ -70,7 +82,7 @@ def to_html_elememts(moves):
                     else:
                         moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
                     first = False
-        log.writelog(f"Finished a cycle. Manifest {manifest} was written to desktop")
+        log.writelog(f"Finished a cycle. Manifest {manifest}OUTBOUND.txt was written to desktop")
     except:
         return
     
@@ -109,6 +121,7 @@ def home():
     global log
     global log_opened
     global manifest
+    global datapath
 
     if not log_opened:
         log_status = log.open_log_file()
@@ -128,10 +141,10 @@ def home():
 
     refresh_ship()
     log.writelog(f"Manifest {manifest} is opened. There are containers on the ship.")
-    csvfile = open("data/action_list.csv", "w")
+    csvfile = open(f"{datapath}\\action_list.csv", "w")
     csvfile.truncate()
     csvfile.close()
-    with open('data/action_list.csv', mode = 'a', newline='') as csvfile:
+    with open(f'{datapath}\\action_list.csv', mode = 'a', newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow(['name','qty','type','coords','weight'])
 
@@ -152,6 +165,7 @@ def selection1():
     global item
     global manifest
     global filepath
+    global datapath
     refresh_ship()
     moves = []
     if request.method == 'POST':
@@ -161,9 +175,10 @@ def selection1():
             # path = solution.moves
             out_bound_manifest = solution.get_outbound_manifest()
 
-            with open(filepath + f"/{manifest}", 'w') as outbound:
-                outbound.write(out_bound_manifest)
-            with open(f"{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
+            # with open(filepath + f"/{manifest}", 'w') as outbound:
+            #     outbound.write(out_bound_manifest)
+            desktop = os.path.expanduser(f"~\Desktop")
+            with open(f"{desktop}\\{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
                 outbound.write(out_bound_manifest)
             build_moves(path)
             # moves.append(ship.get_moves([1, 4], [6, 6]))
@@ -174,11 +189,17 @@ def selection1():
             try:
                 out_bound_manifest = solution.get_outbound_manifest()
 
-                with open(filepath + f"/{manifest}", 'w') as outbound:
+                # with open(filepath + f"/{manifest}", 'w') as outbound:
+                #     outbound.write(out_bound_manifest)
+                print("Success1")
+                desktop = os.path.expanduser(f"~\Desktop")
+                print(f"{desktop}\\{manifest[:-4]}OUTBOUND.txt")
+                with open(f"{desktop}\\{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
+                    print("Success2.5")
                     outbound.write(out_bound_manifest)
-                with open(f"{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
-                    outbound.write(out_bound_manifest)
+                print("Success3")
                 path = solution.moves
+                print("Success4")
                 build_moves(path)
             except:
                 moves = ["SIFT"]
@@ -189,7 +210,7 @@ def selection1():
         return redirect('/table')
 
     global current_user
-    csvfile = open('data/action_list.csv')
+    csvfile = open(f'{datapath}\\action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
     data.pop(0)
     row = len(data)
@@ -200,15 +221,16 @@ def unload():
     global current_user
     global ship
     global item
+    global datapath
     if request.method == 'POST':
         unload = request.form.getlist('unload')
-        with open('data/action_list.csv', mode = 'a',newline='') as csvfile:
+        with open(f'{datapath}\\action_list.csv', mode = 'a',newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in unload:
                 name,position = i.split('__')
                 file_writer.writerow([name,1,'Unload',position,"N/A"])
 
-    csvfile = open('data/action_list.csv')
+    csvfile = open(f'{datapath}\\action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
     data.pop(0)
     row = len(data)
@@ -219,15 +241,16 @@ def unload():
 def load():
     global current_user
     global ship
+    global datapath
     if request.method == 'POST':
         load_name = request.form.get('item_name')
         load_weight = request.form.get('item_weight')
         load_count = request.form.get('item_count')
-        with open('data/action_list.csv', mode = 'a', newline='') as csvfile:
+        with open(f'{datapath}\\action_list.csv', mode = 'a', newline='') as csvfile:
             file_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow([load_name,load_count,'Load','N/A',load_weight])
             
-    csvfile = open('data/action_list.csv')
+    csvfile = open(f'{datapath}\\action_list.csv')
     data = list(csv.reader(csvfile,delimiter=","))
     data.pop(0)
     row = len(data)

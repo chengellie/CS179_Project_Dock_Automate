@@ -1,0 +1,12 @@
+March 25th 2023: 02:27 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:27 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:27 sahas signs in
+March 25th 2023: 02:28 Finished a cycle. Manifest ShipCase1.txt was written to desktop
+March 25th 2023: 02:29 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:29 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:29 sahas signs in
+March 25th 2023: 02:29 Finished a cycle. Manifest ShipCase1.txt was written to desktop
+March 25th 2023: 02:33 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:33 Manifest ShipCase1.txt is opened. There are containers on the ship.
+March 25th 2023: 02:33 sahas signs in
+March 25th 2023: 02:33 Finished a cycle. Manifest ShipCase1.txt was written to desktop

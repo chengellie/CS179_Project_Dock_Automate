@@ -5,7 +5,6 @@ import re
 import json
 from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR
 # https://www.tutorialspoint.com/How-to-change-the-permission-of-a-file-using-Python
-# TODO: Create a retrievable copy. Change visibility of directory
 
 """
 Log class for logging. Will find a log file in designated space and open that. If multiple, choose one with largest year.
@@ -17,13 +16,15 @@ class Log:
     # Private Functions #
     def __init__(self):
         self.debug_flags = [False, False, False]    # directory had to be created, log config had to be created, log file had to be created
-        # self.filepath = os.getcwd() + f"\DockAutomate"   # Testing  Windows
-        # self.filepath = os.path.expanduser(f"~\Documents\DockAutomate") # Windows
-        self.filepath = os.getcwd() + f"\DockAutomate"   # Testing MacOS/Linux
-        # self.filepath = os.path.expanduser(f"~/Documents/DockAutomate") # MacOS/Linux
+
+        self.filepath = os.path.expanduser(f"~\Documents\DockAutomate")
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
             self.debug_flags[0] = True
+        
+        self.filepath += f"\logs"
+        if not os.path.exists(self.filepath):
+            os.mkdir(self.filepath)
         self.jsonfile = self.filepath + "\.log_config.json"
 
         json_found, tmp_file = self.__find_valid_files(".log_config.json")
@@ -112,13 +113,11 @@ class Log:
         return self.writelog(f"Comment: {comment.strip()}")
 
     def create_log_file(self, year:int):
-        if self.valid_log:
-            self.logfile = self.logfile[:-4] + "backup.txt"
         self.logfile = f"{self.filepath}\\{self.name}{year}.txt"
         self.new = True
         with open(self.logfile, 'ab+') as logfile:
             pass
-        # TODO: Check if there's already a log present. If there is, turn it into a backup that can't be detected by Log
+
         self.year = year
         self.__update_json()
         self.debug_flags[2] = True
@@ -127,15 +126,5 @@ class Log:
         if not self.valid_log:  # no valid log files -> create a new one
             return 0
         self.logfile = self.filepath + f"\\{self.logname}"
-
-        # if not self.new:
-        #     with open(self.logfile, 'ab+') as logfile:
-        #         logfile.seek(-2, 2)    # initial seek behind first line
-        #         while logfile.read(1) != b'\n':
-        #             logfile.seek(-2, 1)
-        #         last_action = logfile.readline().decode()
-                
-        #         if "Moved" in last_action or "Offload" in last_action or "Onload" in last_action:   # was in the middle of an operation list
-        #             return 2    # operation list interruption detected -> resync
 
         return 1    # normal -> do nothing
