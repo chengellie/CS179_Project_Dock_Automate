@@ -1,6 +1,7 @@
 ###############################################
 Ship Testing 2
 - ShipCase2.txt
+- Test Log: ShipTest2.txt
 1. Balance Original
 2. Load Bat Onto Original
 3. Balance Resulting Ship

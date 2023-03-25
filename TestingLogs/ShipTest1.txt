@@ -1,6 +1,7 @@
 ###############################################
 Ship Testing 1
 - ShipCase1.txt
+- Test Log: ShipTest1.txt
 1. Balance Original
 2. Unload Cat From Original
 3. Balance Resulting Ship

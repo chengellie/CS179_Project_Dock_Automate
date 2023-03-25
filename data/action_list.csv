@@ -1,1 +1,3 @@
 name,qty,type,coords,weight
+Nat,1,Load,N/A,6543
+Doe,1,Unload,1_4,1100
