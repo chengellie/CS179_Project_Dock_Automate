@@ -450,25 +450,28 @@ class Ship:
             coord.append([i, end_pos[1]])
         return coord
 
-    def move_cntr(self, col_get: int, col_put: int) -> None:
+    def move_cntr(self, col_get: int, col_put: int) -> bool:
         """Inputs column to get container from and move container to. Returns None."""
         # return if moving container from and to same col
         if col_get == col_put:
             print("Error: Container is not being moved")
-            return
+            return False
 
         row_get = self.get_col_top_cntr_depth(col_get)
         # row_get = self.top_columns[col_get] + 1
         # if row_get == self.row or self.ship_state[row_get][col_get].name == "NAN":
         if row_get == -1:
             print("Error: No container to get in column", col_get)
-            return
+            return False
+        elif self.ship_state[row_get][col_get].selected == True:
+            print("Picking Up Desired Container")
+            return False
 
         row_put = self.get_col_top_empty_depth(col_put)
         # row_put = self.top_columns[col_put]
         if row_put == -1:
             print("Error: Cannot put container in this column, column is full.")
-            return
+            return False
         # update cost and moves
         self.time_cost += (
             len(self.get_moves([row_put, col_put], [row_get, col_get])) - 1
@@ -477,6 +480,8 @@ class Ship:
         # self.swap_cntr_pos([row_put, col_put], [row_get, col_get])
         self.moves.append([row_get, col_get])
         self.moves.append([row_put, col_put])
+
+        return True
 
     def time_between_pink_cell(self, col: int, type: str) -> int:
         """Inputs column to move crane to and whether cell contains a container.
@@ -558,6 +563,10 @@ class Ship:
                 )
                 removed_cntr = new_ship.remove_cntr(self.crane_loc)
                 new_ship.moves.extend([removed_cntr.ship_coord,[-1, -1]])
+                
+                if removed_cntr in new_ship.unloads:
+                    print(f"Removing {removed_cntr.name}")
+                    new_ship.unloads.remove(removed_cntr)
             else:
                 print("Error: Container does not need to be unloaded")
                 return None
@@ -633,7 +642,8 @@ class Ship:
 
             # perform move if new_crane_mode is put
             if new_crane_mode == "put":
-                new_ship.move_cntr(self.crane_loc, col)
+                if new_ship.move_cntr(self.crane_loc, col) == False:
+                    return
             elif new_crane_mode == "get":
                 if self.crane_mode == None:
                     # TOOD: check functionality of code below
@@ -645,7 +655,11 @@ class Ship:
                         self.crane_loc, new_ship.crane_loc
                     )
 
-        if heuristic == "cntr-cross":
+        if new_ship is None:
+            return None
+        elif heuristic == "cntr-cross":
             new_ship.set_cntr_cross_bal_heuristic()
+        elif heuristic == "cntr-lu":
+            new_ship.set_cntr_lu_heuristic()
         # TODO: if goal_state is reached, still need to move crane back to pink cell and include that in search
         return new_ship

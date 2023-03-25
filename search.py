@@ -173,7 +173,7 @@ def priority_lu_queueing(
         if child != None and child.generate_ship_key() not in dups:
             total_cost = child.time_cost
             if heuristic == "cntr-lu":
-                total_cost += problem.cntr_lu_heuristic
+                total_cost += child.cntr_lu_heuristic
             nodes.put(PrioritizedShip(total_cost, child))
             print(
                 "Before: loc: ",
@@ -183,7 +183,7 @@ def priority_lu_queueing(
                 ", cost: ",
                 node.time_cost,
                 ", heuristic: ",
-                node.cntr_cross_bal_heuristic,
+                node.cntr_lu_heuristic,
                 sep="",
             )
             print(
@@ -194,7 +194,7 @@ def priority_lu_queueing(
                 ", cost: ",
                 child.time_cost,
                 ", heuristic: ",
-                child.cntr_cross_bal_heuristic,
+                child.cntr_lu_heuristic,
                 sep="",
             )
             print(
