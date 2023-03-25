@@ -571,7 +571,7 @@ class Ship:
                     print(f"Removing {removed_cntr.name}")
                     new_ship.unloads.remove(removed_cntr)
             else:
-                print("Error: Container does not need to be unloaded")
+                # print("Error: Container does not need to be unloaded")
                 return None
 
         return new_ship
@@ -643,12 +643,15 @@ class Ship:
 
         # check crane_loc is not being moved to same col as get
         # if new_crane_mode == "put" and col == self.crane_loc:
-        if col == self.crane_loc:
+        if col == self.crane_loc and col != self.col:
             return None
 
         # check if crane is in loading area
-        if col == self.col and self.crane_loc == self.col and new_crane_mode == "get":
-            new_ship = self.load_unload_loading_area()
+        if col == self.col and self.crane_loc == self.col:
+            if new_crane_mode == "get":
+                new_ship = self.load_unload_loading_area()
+            elif new_crane_mode == "put":
+                return None
         elif col == self.col:
             new_ship = self.move_toward_loading_area()
         elif self.crane_loc == self.col:

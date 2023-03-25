@@ -76,7 +76,7 @@ test_log_file.write("--------- Best Containers\n")
 
 # ---------------------------------------------------------------------------------------
 test_log_file.write("============================== Initializing Log File (Multi-Step)\n")
-shutil.rmtree("DockAutomate\\")
+# shutil.rmtree("DockAutomate\\")
 log = Log()
 if not log.open_log_file():
     log.create_log_file(2023)
