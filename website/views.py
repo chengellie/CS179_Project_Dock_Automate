@@ -16,6 +16,8 @@ tables = Blueprint("tables", __name__)
 unloading = Blueprint("unloading", __name__)
 loading = Blueprint("loading", __name__)
 notes = Blueprint('notes',__name__)
+log = Blueprint('log',__name__)
+
 log = Log()
 log_opened = False
 manifest = ""
@@ -244,3 +246,14 @@ def note():
         print(user_note)
         log.writecomment(user_note)
     return render_template("notes.html",user = current_user)
+
+@log.route("/",methods = ['GET','POST'])
+def build_log():
+    global log
+    if request.method == 'POST':
+        log_year = request.form.get('log_year')
+
+        print(log_year)
+
+
+    return render_template("log.html",user = current_user)
