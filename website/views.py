@@ -4,6 +4,7 @@ from ship import Ship
 from util import *
 from search import *
 from container import Container
+from log import Log
 import os
 import sys
 import copy
@@ -15,6 +16,9 @@ tables = Blueprint("tables", __name__)
 unloading = Blueprint("unloading", __name__)
 loading = Blueprint("loading", __name__)
 notes = Blueprint('notes',__name__)
+log = Log()
+log_opened = False
+manifest = ""
 
 current_user = ''
 current_ship = ''
@@ -25,13 +29,25 @@ item = ''
 def refresh_ship():
     global ship
     global item
+    global log
+    filepath = os.getcwd() + f"/DockAutomate/manifest"   # Testing  Windows
+    # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
+    for x in os.listdir(filepath):
+        print(x)
+        if x.endswith(".txt"):
+            manifest = filepath + f"/{x}"
+            break
     ship = create_ship(
-        "ShipCase/ShipCase4.txt",
+        manifest,
         "data/action_list.csv"
     )
+    log.writelog(f"Manifest {manifest} is opened. There are containers on the ship.")
     item = copy.deepcopy(ship.ship_state)
 
 def to_html_elememts(moves):
+    global log
+    global ship
+    global manifest
     load_list = [i.name for i in ship.loads]
     try:
         for j in range(len(moves)):
@@ -39,11 +55,15 @@ def to_html_elememts(moves):
                 for i, ls in enumerate(moves[j]):
                     if first and ls[0] < 0:
                         moves[j][i] = "add"
+                        cntr_name = load_list.pop(0)
+                        log.writelog(f"\"{cntr_name}\" is onloaded.")
                     elif ls[0] < 0:
                         moves[j][i] = "remove"
+                        log.writelog(f"\"{ship.ship_state[j][i]}\" is offloaded.")
                     else:
                         moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
                     first = False
+        log.writelog(f"Finished a cycle. Manifest {manifest} was written to desktop")
     except:
         return
     
@@ -78,6 +98,23 @@ def home():
     global ship
     global item
     global current_user
+    global log
+    global log_opened
+
+    if not log_opened:
+        log_status = log.open_log_file()
+        if log_status == 0:
+            # Tell user there is no valid log file, and you will be creating one
+            # Ask user to input a year
+            # year = input()
+            log.create_log_file(2023)
+            log_opened = True
+            
+        elif log_status == 1:   # Everything is good
+            print("File Opened")
+            # It asks me “Do you want to start a new log file?” 
+                # If YES, it asks me “The log file has the logical year appended to its name, What year do you want the log file”
+            log_opened = True
 
     if current_user != '':
         # user logged out
@@ -199,8 +236,11 @@ def table():
 @notes.route("/" , methods = ['GET','POST'])
 def note():
     global current_user
+    global log
+
     if request.method == 'POST':
         user_note = request.form.get('user_note')
         # user added note
         print(user_note)
+        log.writecomment(user_note)
     return render_template("notes.html",user = current_user)
