@@ -17,6 +17,7 @@ unloading = Blueprint("unloading", __name__)
 loading = Blueprint("loading", __name__)
 notes = Blueprint('notes',__name__)
 logs = Blueprint('log',__name__)
+select_log = Blueprint('select_log',__name__)
 
 log = Log()
 log_opened = False
@@ -122,6 +123,7 @@ def home():
             # It asks me “Do you want to start a new log file?” 
                 # If YES, it asks me “The log file has the logical year appended to its name, What year do you want the log file”
             log_opened = True
+            return redirect('/log_select')
 
 
     refresh_ship()
@@ -279,3 +281,7 @@ def build_log():
 
 
     return render_template("log.html",user = current_user)
+
+@select_log.route("/")
+def log_selection():
+    return render_template('log_check.html')
