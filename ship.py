@@ -143,6 +143,8 @@ class Ship:
             for cntr in row:
                 ret += cntr.name
         ret += str(self.crane_loc)
+        if self.crane_loc == self.col:
+            ret += self.crane_mode
         return ret
 
     def get_left_right_mass(self) -> int:
@@ -188,6 +190,7 @@ class Ship:
         for cntr in self.unloads:
             cnt += self.get_container_depth(cntr)
         self.cntr_lu_heuristic = cnt
+
     # def set_col_move_bal_heuristic(self) -> None:
     #     """Inputs None, computes heuristic for balance. Returns None.
     #     h(n) = minimum number of columns to move the minimum number of containers across mid-line to achieve balanced ship
@@ -523,7 +526,7 @@ class Ship:
         # update cost and moves
         return len(self.get_moves([start_row, start_col], [end_row, end_col])) - 1
 
-    def move_toward_loading_area(self, heuristic: str = None):
+    def move_toward_loading_area(self):
         """Inputs heuristic. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
@@ -562,8 +565,8 @@ class Ship:
                     new_ship.time_between_pink_cell(self.crane_loc, "cntr") + 2
                 )
                 removed_cntr = new_ship.remove_cntr(self.crane_loc)
-                new_ship.moves.extend([removed_cntr.ship_coord,[-1, -1]])
-                
+                new_ship.moves.extend([removed_cntr.ship_coord, [-1, -1]])
+
                 if removed_cntr in new_ship.unloads:
                     print(f"Removing {removed_cntr.name}")
                     new_ship.unloads.remove(removed_cntr)
@@ -573,7 +576,7 @@ class Ship:
 
         return new_ship
 
-    def move_away_loading_area(self, col: int, heuristic: str = None):
+    def move_away_loading_area(self, col: int):
         """Inputs column to move crane to and heuristic. Returns new Ship object after move, None if move not valid."""
         if self.crane_mode == "get":
             new_crane_mode = "put"
@@ -598,6 +601,20 @@ class Ship:
             new_cntr_coord = new_ship.add_cntr(new_ship.loads.pop(), col)
 
             new_ship.moves.extend([[-1, -1], new_cntr_coord])
+
+        return new_ship
+
+    def load_unload_loading_area(self):
+        """Inputs None. Returns new Ship object after move, None if move not valid."""
+        # check if there is nothing else to load
+        if not self.loads:
+            print("Error: no containers to load onto ship")
+            return None
+        else:
+            # cost from previous put to truck
+            new_ship = copy.deepcopy(self)
+            new_ship.crane_loc = self.col
+            new_ship.crane_mode = "get"
 
         return new_ship
 
@@ -630,10 +647,12 @@ class Ship:
             return None
 
         # check if crane is in loading area
-        if col == self.col:
-            new_ship = self.move_toward_loading_area(heuristic)
+        if col == self.col and self.crane_loc == self.col and new_crane_mode == "get":
+            new_ship = self.load_unload_loading_area()
+        elif col == self.col:
+            new_ship = self.move_toward_loading_area()
         elif self.crane_loc == self.col:
-            new_ship = self.move_away_loading_area(col, heuristic)
+            new_ship = self.move_away_loading_area(col)
         else:
             # construct new ship with move performed
             new_ship = copy.deepcopy(self)

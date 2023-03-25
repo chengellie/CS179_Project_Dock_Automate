@@ -116,11 +116,11 @@ def uniform_cost_balance(problem: Ship, heuristic: str = None) -> Optional[Ship]
     if len(all_weights) == 0:
         print("Already Balanced")
         return problem
-    elif len(all_weights) == 1:   # TODO: SIFT, just move this single container
+    elif len(all_weights) == 1:  # TODO: SIFT, just move this single container
         print("Error: unsolvable ship")
         return None
     all_weights.sort(reverse=True)
-    if all_weights[0] * 0.9 > sum(all_weights[1:]): # TODO SIFT, find optimal moves
+    if all_weights[0] * 0.9 > sum(all_weights[1:]):  # TODO SIFT, find optimal moves
         print("Error: unsolvable ship")
         return None
 
@@ -175,35 +175,35 @@ def priority_lu_queueing(
             if heuristic == "cntr-lu":
                 total_cost += child.cntr_lu_heuristic
             nodes.put(PrioritizedShip(total_cost, child))
-            print(
-                "Before: loc: ",
-                node.crane_loc,
-                ", mode: ",
-                node.crane_mode,
-                ", cost: ",
-                node.time_cost,
-                ", heuristic: ",
-                node.cntr_lu_heuristic,
-                sep="",
-            )
-            print(
-                "After: loc: ",
-                child.crane_loc,
-                ", mode: ",
-                child.crane_mode,
-                ", cost: ",
-                child.time_cost,
-                ", heuristic: ",
-                child.cntr_lu_heuristic,
-                sep="",
-            )
-            print(
-                "total:",
-                total_cost,
-                "\nkey:",
-                child.generate_ship_key(),
-            )
-            print(child)
+            # print(
+            #     "Before: loc: ",
+            #     node.crane_loc,
+            #     ", mode: ",
+            #     node.crane_mode,
+            #     ", cost: ",
+            #     node.time_cost,
+            #     ", heuristic: ",
+            #     node.cntr_lu_heuristic,
+            #     sep="",
+            # )
+            # print(
+            #     "After: loc: ",
+            #     child.crane_loc,
+            #     ", mode: ",
+            #     child.crane_mode,
+            #     ", cost: ",
+            #     child.time_cost,
+            #     ", heuristic: ",
+            #     child.cntr_lu_heuristic,
+            #     sep="",
+            # )
+            # print(
+            #     "total:",
+            #     total_cost,
+            #     "\nkey:",
+            #     child.generate_ship_key(),
+            # )
+            # print(child)
             dups.add(child.generate_ship_key())
 
 

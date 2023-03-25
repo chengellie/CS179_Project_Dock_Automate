@@ -1,2 +1,3 @@
 name,qty,type,coords,weight
-Bat,1,Load,N/A,5432
+Cow,1,Unload,7_1,500
+Rat,1,Load,N/A,5397
