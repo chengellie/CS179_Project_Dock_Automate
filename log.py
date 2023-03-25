@@ -17,9 +17,9 @@ class Log:
     # Private Functions #
     def __init__(self):
         self.debug_flags = [False, False, False]    # directory had to be created, log config had to be created, log file had to be created
-        self.filepath = os.getcwd() + f"\DockAutomate"   # Testing  Windows
+        # self.filepath = os.getcwd() + f"\DockAutomate"   # Testing  Windows
         # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
-        # self.filepath = os.getcwd() + f"/.DockAutomate"   # Testing MacOS/Linux
+        self.filepath = os.getcwd() + f"/.DockAutomate"   # Testing MacOS/Linux
         # self.filepath = os.path.expanduser(f"~/Documents/.DockAutomate") # MacOS/Linux
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
@@ -58,6 +58,8 @@ class Log:
                 self.__update_json()
         else:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{self.year}.txt")
+
+        # self.logfile = self.filepath + "/ "
     
     """Search through ~\.DockAutomate directory for a valid Log file"""
     def __find_valid_files(self, filename:str):
@@ -115,6 +117,7 @@ class Log:
         self.new = True
         with open(self.logfile, 'ab+') as logfile:
             pass
+        # TODO: Check if there's already a log present. If there is, turn it into a backup that can't be detected by Log
         self.year = year
         self.__update_json()
         self.debug_flags[2] = True
