@@ -1,3 +1,3 @@
 name,qty,type,coords,weight
-Cat,1,Unload,7_1,99
-Elephant,1,Load,N/A,250
+Snake,1,Load,N/A,100
+Owl   ,1,Unload,2_4,N/A

@@ -57,6 +57,7 @@
     // https://stackoverflow.com/questions/3583724/how-do-i-add-a-delay-in-a-javascript-loop
     const timer = ms => new Promise(res => setTimeout(res, ms))
     var moves_list = {{ moves|tojson }};
+    var load_list = {{loads|tojson }};
     var space_flag = true;
     var loop_flag = "loop";
     var moves;
@@ -65,11 +66,18 @@
         var containter_name = "#move_container";
         if(moves_list.length > 0){
             moves = moves_list.shift();
+            if(moves == "SIFT"){
+                $(containter_name).text("Perform SIFT");
+                return;
+            }
             var id_container = moves[0];
             var text = $(id_container).text();
             $(containter_name).text("Move Container: " + text);
             if(moves[moves.length-1] == "remove"){
                 remove();
+            }
+            else if(moves[0] == "add"){
+                add();
             }
             else{
                 swap();
@@ -80,12 +88,64 @@
         $(containter_name).text("All Steps Are Complete!");
         $(containter_name).css('background-color', 'green');
         }      
-    }   
+    }
+    
+    async function add(){
+        var id_start;
+        var id_end;
+        var loaded_item = load_list.shift();
+        $("#move_container").text("Load Container: " + loaded_item);
+        
+        while(true){
+            id_start = moves[1];
+            $(id_start).text(loaded_item);
+            $(id_start).css('background-color', 'red');
+            $(id_start).css('color', 'white');
+            await timer(500);
+
+            for (var i = 1; i + 1 < moves.length; i++) {
+                console.log(i);
+                id_start = moves[i];
+                id_end = moves[i+1];
+                var text_start = $(id_start).text();
+                var text_end = $(id_end).text();
+                var color_start = $(id_start).css( "color" );
+                var color_end = $(id_end).css( "color" );
+                $(id_end).text(text_start);
+                $(id_end).css('background-color', 'red');
+                $(id_end).css('color', color_start);
+                $(id_start).text(text_end);
+                $(id_start).css('background-color', color_end);
+                $(id_start).css('color', color_end);
+
+                await timer(500); // then the created Promise can be awaited
+            }
+            $(id_end).css('background-color', '{{color[0]}}');
+
+            if(loop_flag == "stop_loop"){
+                break;
+            }
+
+            if(loop_flag == "loop" || loop_flag == "keep_loop"){
+                id_start = moves[moves.length-1];
+
+                $(id_start).text("UNUSED");
+                $(id_start).css('background-color', "white");
+                $(id_start).css('color', "white");
+                loop_flag = "keep_loop";
+                // await timer(500); // then the created Promise can be awaited
+            }
+        }
+        loop_flag = "loop";
+        manage();
+    }
     
     async function remove(){
         var id_start;
         var id_end;
-        console.log("Hellos");
+        var unload_item = $(moves[0]).text();
+        $("#move_container").text("Unload Container: " + unload_item);
+        
         while(true){
             for (var i = 0; i + 1 < moves.length; i++) {
                 console.log(moves[i]);
@@ -120,7 +180,7 @@
             if(loop_flag == "loop" || loop_flag == "keep_loop"){
                 id_start = moves[0];
                 await timer(500);
-                $(id_start).text(text_start);
+                $(id_start).text(unload_item);
                 $(id_start).css('background-color', 'red');
                 $(id_start).css('color', 'white');
                 loop_flag = "keep_loop";

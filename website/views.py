@@ -25,35 +25,50 @@ def refresh_ship():
     global ship
     global item
     ship = create_ship(
-        "ShipCase/ShipCase1.txt",
+        "ShipCase/ShipCase4.txt",
+        "data/action_list.csv"
     )
     item = copy.deepcopy(ship.ship_state)
 
 def to_html_elememts(moves):
-    for j in range(len(moves)):
-            first = True
-            for i, ls in enumerate(moves[j]):
-                if first and ls[0] < 0:
-                    moves[j][i] = "add"
-                elif ls[0] < 0:
-                    moves[j][i] = "remove"
-                else:
-                    moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
-                first = False
-
+    try:
+        for j in range(len(moves)):
+                first = True
+                for i, ls in enumerate(moves[j]):
+                    if first and ls[0] < 0:
+                        moves[j][i] = "add"
+                    elif ls[0] < 0:
+                        moves[j][i] = "remove"
+                    else:
+                        moves[j][i] = "#ship_" + str(ls[0]) + "_" + str(ls[1])
+                    first = False
+    except:
+        return
+    
 def build_moves(path):
     global moves
     i=0
     while i < len(path):
         start = path[i]
-        print(start)
         end = path[i+1]
-        print(end)
+        if start[0] < 0:
+            start[1] = end[1]
+            # ship.add_cntr('TEMP', end[1])
+        elif end[0] < 0:
+            end[1] = start[1]
+            ship.remove_cntr(start[1])
+        else:
+            ship.add_cntr(ship.remove_cntr(start[1]), end[1])
         moves.append(ship.get_moves(start,end))
-        ship.add_cntr(ship.remove_cntr(start[1]), end[1])
         i+=2
         
-    
+# def lu_moves(path):
+#     global moves
+#     i = 0
+#     while i < len(path):
+#         start = path[i]
+#         end = path[i+1]
+        
 
 @home_page.route("/", methods = ['GET','POST'])
 def home():
@@ -83,18 +98,20 @@ def selection1():
     moves = []
     if request.method == 'POST':
         if request.form['submit_button'] == 'load_unload':
-            moves.append([[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]])
-            moves.append(ship.get_moves([1, 4], [6, 6]))
+            solution = uniform_cost_lu(ship)
+            path = solution.moves
+            # path = solution.moves
+            build_moves(path)
+            # moves.append(ship.get_moves([1, 4], [6, 6]))
             print("load/unload selected")
 
         elif request.form['submit_button'] == 'balance':
-            # moves.append(ship.get_moves([0, 4], [6, 6]))
-            # moves = [[[0, 4], [0, 5], [0, 6], [1, 6], [2, 6], [1, 6], [0, 6], [-10, 6]]]
-            # moves.append(ship.get_moves([1, 4], [5, 6]))
             solution = uniform_cost_balance(ship,"cntr-cross")
-            path = solution.moves
-            print(path)
-            build_moves(path)
+            try:
+                path = solution.moves
+                build_moves(path)
+            except:
+                moves = ["SIFT"]
 
             print("balance selected")
         
@@ -158,6 +175,7 @@ def table():
     row = len(item)
     col = len(item[0])
     color = ["rgb(44, 174, 214)", "red"] 
+    loads = [i.name for i in ship.loads]
     print(moves)
     return render_template(
         "table.html",
@@ -166,6 +184,7 @@ def table():
         row=row,
         col=col,
         moves=moves,
+        loads = loads,
         user = current_user,
     )
 
