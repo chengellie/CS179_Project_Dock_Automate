@@ -109,6 +109,7 @@ def home():
             # Tell user there is no valid log file, and you will be creating one
             # Ask user to input a year
             # year = input()
+            return redirect('/log')
             log.create_log_file(2023)
             log_opened = True
             
@@ -254,6 +255,7 @@ def build_log():
         log_year = request.form.get('log_year')
 
         print(log_year)
+        return redirect('/')
 
 
     return render_template("log.html",user = current_user)
