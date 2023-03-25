@@ -18,9 +18,9 @@ class Log:
     def __init__(self):
         self.debug_flags = [False, False, False]    # directory had to be created, log config had to be created, log file had to be created
         # self.filepath = os.getcwd() + f"\DockAutomate"   # Testing  Windows
-        # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
-        self.filepath = os.getcwd() + f"/.DockAutomate"   # Testing MacOS/Linux
-        # self.filepath = os.path.expanduser(f"~/Documents/.DockAutomate") # MacOS/Linux
+        # self.filepath = os.path.expanduser(f"~\Documents\DockAutomate") # Windows
+        self.filepath = os.getcwd() + f"\DockAutomate"   # Testing MacOS/Linux
+        # self.filepath = os.path.expanduser(f"~/Documents/DockAutomate") # MacOS/Linux
         if not os.path.exists(self.filepath):
             os.mkdir(self.filepath)
             # os.system(f"attrib +h {self.filepath}")
@@ -59,7 +59,7 @@ class Log:
         else:
             self.valid_log, self.logname = self.__find_valid_files(f"{self.name}{self.year}.txt")
 
-        # self.logfile = self.filepath + "/ "
+        self.logfile = ""
     
     """Search through ~\.DockAutomate directory for a valid Log file"""
     def __find_valid_files(self, filename:str):
@@ -114,7 +114,7 @@ class Log:
 
     def create_log_file(self, year:int):
         if self.valid_log:
-            self.logfile = self.logfile[-4:] + "backup.txt"
+            self.logfile = self.logfile[:-4] + "backup.txt"
         self.logfile = f"{self.filepath}\\{self.name}{year}.txt"
         self.new = True
         with open(self.logfile, 'ab+') as logfile:
@@ -129,14 +129,14 @@ class Log:
             return 0
         self.logfile = self.filepath + f"\\{self.logname}"
 
-        if not self.new:
-            with open(self.logfile, 'ab+') as logfile:
-                logfile.seek(-2, 2)    # initial seek behind first line
-                while logfile.read(1) != b'\n':
-                    logfile.seek(-2, 1)
-                last_action = logfile.readline().decode()
+        # if not self.new:
+        #     with open(self.logfile, 'ab+') as logfile:
+        #         logfile.seek(-2, 2)    # initial seek behind first line
+        #         while logfile.read(1) != b'\n':
+        #             logfile.seek(-2, 1)
+        #         last_action = logfile.readline().decode()
                 
-                if "Moved" in last_action or "Offload" in last_action or "Onload" in last_action:   # was in the middle of an operation list
-                    return 2    # operation list interruption detected -> resync
+        #         if "Moved" in last_action or "Offload" in last_action or "Onload" in last_action:   # was in the middle of an operation list
+        #             return 2    # operation list interruption detected -> resync
 
         return 1    # normal -> do nothing

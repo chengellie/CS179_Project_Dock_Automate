@@ -16,11 +16,12 @@ tables = Blueprint("tables", __name__)
 unloading = Blueprint("unloading", __name__)
 loading = Blueprint("loading", __name__)
 notes = Blueprint('notes',__name__)
-log = Blueprint('log',__name__)
+logs = Blueprint('log',__name__)
 
 log = Log()
 log_opened = False
 manifest = ""
+filepath = os.getcwd() + f"/DockAutomate/manifest"   # Testing  Windows
 
 current_user = ''
 current_ship = ''
@@ -32,18 +33,21 @@ def refresh_ship():
     global ship
     global item
     global log
-    filepath = os.getcwd() + f"/DockAutomate/manifest"   # Testing  Windows
+    global manifest
+    global filepath
+    
     # self.filepath = os.path.expanduser(f"~\Documents\.DockAutomate") # Windows
     for x in os.listdir(filepath):
         print(x)
         if x.endswith(".txt"):
-            manifest = filepath + f"/{x}"
+            manifest_path = filepath + f"/{x}"
+            manifest = x
             break
     ship = create_ship(
-        manifest,
+        manifest_path,
         "data/action_list.csv"
     )
-    log.writelog(f"Manifest {manifest} is opened. There are containers on the ship.")
+    
     item = copy.deepcopy(ship.ship_state)
 
 def to_html_elememts(moves):
@@ -77,8 +81,9 @@ def build_moves(path):
         end = path[i+1]
         if start[0] < 0:
             start[1] = end[1]
-            # temp_container = Container()
-            # ship.add_cntr('TEMP', end[1])
+            temp_container = Container([-1,-1], 0, 'TEMP', [ship.row, ship.col])
+            temp_container.set_ship_coord(end)
+            ship.add_cntr(temp_container, end[1])
         elif end[0] < 0:
             end[1] = start[1]
             ship.remove_cntr(start[1])
@@ -102,16 +107,15 @@ def home():
     global current_user
     global log
     global log_opened
+    global manifest
 
     if not log_opened:
         log_status = log.open_log_file()
         if log_status == 0:
-            # Tell user there is no valid log file, and you will be creating one
-            # Ask user to input a year
-            # year = input()
-            return redirect('/log')
-            log.create_log_file(2023)
+            # Tell user there is no valid log file, and you will be creating one, ask user to input a year
             log_opened = True
+            return redirect('/log')
+            
             
         elif log_status == 1:   # Everything is good
             print("File Opened")
@@ -119,11 +123,9 @@ def home():
                 # If YES, it asks me “The log file has the logical year appended to its name, What year do you want the log file”
             log_opened = True
 
-    if current_user != '':
-        # user logged out
-        pass
 
     refresh_ship()
+    log.writelog(f"Manifest {manifest} is opened. There are containers on the ship.")
     csvfile = open("data/action_list.csv", "w")
     csvfile.truncate()
     csvfile.close()
@@ -132,8 +134,12 @@ def home():
             file_writer.writerow(['name','qty','type','coords','weight'])
 
     if request.method == 'POST':
+        if current_user != '':
+            # user logged out
+            log.writelog(f"{current_user} signs out")
         current_user = request.form.get('current_user')
         # user logged in
+        log.writelog(f"{current_user} signs in")
         return redirect('/home-selection')
     return render_template("home.html",user = current_user)
 
@@ -142,13 +148,21 @@ def selection1():
     global moves
     global ship
     global item
+    global manifest
+    global filepath
     refresh_ship()
     moves = []
     if request.method == 'POST':
         if request.form['submit_button'] == 'load_unload':
-            solution = uniform_cost_lu(ship)
+            solution = uniform_cost_lu(ship, 'cntr-lu')
             path = solution.moves
             # path = solution.moves
+            out_bound_manifest = solution.get_outbound_manifest()
+
+            with open(filepath + f"/{manifest}", 'w') as outbound:
+                outbound.write(out_bound_manifest)
+            with open(f"{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
+                outbound.write(out_bound_manifest)
             build_moves(path)
             # moves.append(ship.get_moves([1, 4], [6, 6]))
             print("load/unload selected")
@@ -156,6 +170,12 @@ def selection1():
         elif request.form['submit_button'] == 'balance':
             solution = uniform_cost_balance(ship,"cntr-cross")
             try:
+                out_bound_manifest = solution.get_outbound_manifest()
+
+                with open(filepath + f"/{manifest}", 'w') as outbound:
+                    outbound.write(out_bound_manifest)
+                with open(f"{manifest[:-4]}OUTBOUND.txt", 'w') as outbound:
+                    outbound.write(out_bound_manifest)
                 path = solution.moves
                 build_moves(path)
             except:
@@ -248,12 +268,12 @@ def note():
         log.writecomment(user_note)
     return render_template("notes.html",user = current_user)
 
-@log.route("/",methods = ['GET','POST'])
+@logs.route("/",methods = ['GET','POST'])
 def build_log():
     global log
     if request.method == 'POST':
         log_year = request.form.get('log_year')
-
+        log.create_log_file(log_year)
         print(log_year)
         return redirect('/')
 
