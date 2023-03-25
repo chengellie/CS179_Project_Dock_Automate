@@ -113,6 +113,8 @@ class Log:
         return self.writelog(f"Comment: {comment.strip()}")
 
     def create_log_file(self, year:int):
+        if self.valid_log:
+            self.logfile = self.logfile[-4:] + "backup.txt"
         self.logfile = f"{self.filepath}\\{self.name}{year}.txt"
         self.new = True
         with open(self.logfile, 'ab+') as logfile:
